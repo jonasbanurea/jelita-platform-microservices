@@ -52,7 +52,7 @@ curl http://localhost:3040/health  # Archive
 # Login test
 curl -X POST http://localhost:3001/api/auth/login `
   -H "Content-Type: application/json" `
-  -d '{"username":"demo","password":"demo123"}'
+  -d '{"username":"demo","password":"*****"}'
 
 # Save token from response, then test other endpoints
 ```
@@ -62,7 +62,7 @@ curl -X POST http://localhost:3001/api/auth/login `
 Browser: **http://localhost:8080**
 - Server: `mysql`
 - Username: `root`
-- Password: `Enter*123`
+- Password: `********`
 
 ---
 
