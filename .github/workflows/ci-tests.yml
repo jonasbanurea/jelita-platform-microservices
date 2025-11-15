@@ -11,8 +11,8 @@ on:
   workflow_dispatch:  # Manual trigger
 
 env:
-  MYSQL_ROOT_PASSWORD: Enter*123
-  JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
+  MYSQL_ROOT_PASSWORD: ********
+  JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7****123igEbMUH6tni78oAjzSPqYXvoyP02N********
 
 jobs:
   # =========================================
