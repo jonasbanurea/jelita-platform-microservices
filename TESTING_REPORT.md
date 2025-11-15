@@ -1,45 +1,45 @@
-# Laporan Pengujian & Evaluasi Jelita Microservices
+# Jelita Microservices Testing & Evaluation Report
 
-- Tanggal: 13 Nov 2025
-- Lingkungan: Windows + Docker Desktop, PowerShell, Node.js 18, MySQL 8.0
-- Stack layanan: Auth, Pendaftaran, Workflow, Survey (SKM), Archive
+- Date: Nov 13, 2025
+- Environment: Windows + Docker Desktop, PowerShell, Node.js 18, MySQL 8.0
+- Service Stack: Auth, Application, Workflow, Survey (SKM), Archive
 
-## Ringkasan Eksekutif
-- Tujuan: Validasi fungsi, interoperabilitas antar layanan, dan uji skalabilitas dasar (baseline vs stress).
-- Hasil singkat:
-  - Fungsional: Semua alur utama berjalan (signin → permohonan → submit SKM → arsip → verifikasi).
-  - Interoperabilitas: Token JWT dipakai lintas layanan; referensi `permohonan_id` konsisten dari Pendaftaran → Survey → Arsip.
-  - Baseline (10 VUs, ~1m40s): p95 160 ms, ~52.7 req/s, error 6.68% (utama 404 pada baca arsip ketika data belum tersedia).
-  - Stress (s.d. 300 VUs, ~7m): p95 9.64 s, error 26.85%, bottleneck pada login (p95 11.55 s) dan endpoint internal arsip (EOF di beban tinggi).
+## Executive Summary
+- **Objective**: Validate functionality, inter-service interoperability, and basic scalability testing (baseline vs stress).
+- **Key Results**:
+  - **Functional**: All main flows working (signin → application → submit SKM → archive → verification).
+  - **Interoperability**: JWT tokens used across services; `permohonan_id` reference consistent from Application → Survey → Archive.
+  - **Baseline** (10 VUs, ~1m40s): p95 160 ms, ~52.7 req/s, error 6.68% (mainly 404 on archive read when data not yet available).
+  - **Stress** (up to 300 VUs, ~7m): p95 9.64 s, error 26.85%, bottleneck on login (p95 11.55 s) and internal archive endpoint (EOF under high load).
 
-## Lingkungan Uji
-- Docker Compose dengan 7 kontainer: `mysql`, `phpmyadmin`, `auth`, `pendaftaran`, `workflow`, `survey`, `archive`.
-- Port: MySQL host 3307→container 3306; layanan: 3001/3010/3020/3030/3040; phpMyAdmin 8080.
-- Database per layanan: `jelita_users`, `jelita_pendaftaran`, `jelita_workflow`, `jelita_survei`, `jelita_arsip`.
-- Data ringkas (akhir sesi): Users=4, Permohonan=1, SKM=1, Arsip=4810.
+## Test Environment
+- Docker Compose with 7 containers: `mysql`, `phpmyadmin`, `auth`, `application`, `workflow`, `survey`, `archive`.
+- Ports: MySQL host 3307→container 3306; services: 3001/3010/3020/3030/3040; phpMyAdmin 8080.
+- Database per service: `jelita_users`, `jelita_pendaftaran`, `jelita_workflow`, `jelita_survei`, `jelita_arsip`.
+- Summary data (end of session): Users=4, Applications=1, SKM=1, Archives=4810.
 
-## Validasi Fungsional
-- Auth: `POST /api/auth/signin` mengembalikan `accessToken` (JWT) dengan payload `{id, role}`.
-- Pendaftaran: `POST /api/permohonan` membuat permohonan ID 1 (menyimpan `data_pemohon`).
-- Survey: `POST /api/skm/submit` menerima `permohonan_id=1` dan `jawaban_json`, status `completed` tersimpan.
-- Archive: `POST /api/internal/arsipkan-dokumen` membuat arsip (tanpa auth, internal), `GET /api/arsip/:id` perlu role Admin/OPD/Pimpinan.
+## Functional Validation
+- Auth: `POST /api/auth/signin` returns `accessToken` (JWT) with payload `{id, role}`.
+- Application: `POST /api/permohonan` creates application ID 1 (stores `data_pemohon`).
+- Survey: `POST /api/skm/submit` accepts `permohonan_id=1` and `jawaban_json`, status `completed` saved.
+- Archive: `POST /api/internal/arsipkan-dokumen` creates archive (no auth, internal), `GET /api/arsip/:id` requires Admin/OPD/Pimpinan role.
 
-### Tabel Status Endpoint (sampel uji manual)
-| Layanan | Endpoint | Metode | Auth | Hasil |
+### Endpoint Status Table (manual test sample)
+| Service | Endpoint | Method | Auth | Result |
 |---|---|---|---|---|
 | Auth | `/api/auth/signin` | POST | - | 200, `accessToken` ✓ |
-| Pendaftaran | `/api/permohonan` | POST | Bearer | 201, ID=1 ✓ |
-| Survey | `/api/skm/submit` | POST | Bearer (Pemohon) | 201, SKM ID=1 ✓ |
-| Archive | `/api/internal/arsipkan-dokumen` | POST | - | 201, Arsip ID bertambah ✓ |
-| Archive | `/api/arsip/1` | GET | Bearer (Admin) | 200, data arsip ✓ |
+| Application | `/api/permohonan` | POST | Bearer | 201, ID=1 ✓ |
+| Survey | `/api/skm/submit` | POST | Bearer (Applicant) | 201, SKM ID=1 ✓ |
+| Archive | `/api/internal/arsipkan-dokumen` | POST | - | 201, Archive ID incremented ✓ |
+| Archive | `/api/arsip/1` | GET | Bearer (Admin) | 200, archive data ✓ |
 
-## Interoperabilitas (Alur Lintas Layanan)
+## Interoperability (Cross-Service Flow)
 ```mermaid
 sequenceDiagram
   autonumber
-  actor U as Pemohon
+  actor U as Applicant
   participant A as Auth Service
-  participant P as Pendaftaran
+  participant P as Application
   participant S as Survey (SKM)
   participant R as Archive
 
@@ -51,111 +51,131 @@ sequenceDiagram
   S-->>U: 201 {skm_id, status: completed}
   U->>R: POST /api/internal/arsipkan-dokumen {permohonan_id,...}
   R-->>U: 201 {arsip_id, status: pending}
-  Note over R: Data arsip siap diverifikasi oleh Admin
+  Note over R: Archive data ready for Admin verification
 ```
 
-## Uji Beban — Baseline (k6)
-- Skenario: 10 VUs, ~1m40s, health check + signin + baca arsip sederhana.
-- Hasil utama:
+## Load Test — Baseline (k6)
+- Scenario: 10 VUs, ~1m40s, health check + signin + simple archive read.
+- **Reasoning for baseline 10 VUs configuration**:
+  - Simulates normal daily usage (5-15 concurrent users realistic for government licensing applications)
+  - Baseline performance characteristics of system without stress to determine performance budget
+  - Validation that system can handle minimal load with acceptable response time (target p95 < 500ms)
+  - Benchmark for comparison with stress test results (performance degradation factor)
+- Main results:
   - Throughput: ~52.7 req/s
   - p95 `http_req_duration`: ~160 ms
-  - Error rate: ~6.68% (utama dari 404 `GET /api/arsip/1` saat data belum ada di sebagian iterasi)
+  - Error rate: ~6.68% (mainly from 404 `GET /api/arsip/1` when data not yet available in some iterations)
 
-| Metrik | Nilai |
+| Metric | Value |
 |---|---|
 | VUs | 10 |
-| Durasi | 1m40s |
+| Duration | 1m40s |
 | Request/s | ~52.7 |
-| p95 Latensi | ~160 ms |
+| p95 Latency | ~160 ms |
 | Error Rate | ~6.68% |
 
-Catatan: Setelah perbaikan endpoint (`/signin`, `accessToken`), error fungsional menurun; sisanya 404 yang expected pada data terbatas.
+Note: After endpoint fixes (`/signin`, `accessToken`), functional errors decreased; remaining 404s are expected on limited data.
 
-## Uji Beban — Stress (k6)
-- Skenario: naik bertahap s.d. 300 VUs (~7m); memicu arsip internal, login, dan baca arsip.
-- Hasil utama (diringkas dari log k6):
+## Load Test — Stress (k6)
+- Scenario: gradual ramp up to 300 VUs (~7m); trigger internal archive, login, and read archive.
+- **Reasoning for stress 300 VUs configuration**:
+  - Simulates peak/viral load (e.g., new policy announcement, mass licensing deadline)
+  - Identifies bottlenecks and breaking point of system before total failure
+  - 300 VUs = ~30x baseline to measure significant performance degradation
+  - Practical limitation: single-host development environment (laptop/desktop) with limited resources
+  - Validates whether system can gracefully degrade vs crash under pressure
+  - 7-minute timeline allows gradual ramp-up (0→300 VUs) to observe behavior patterns
+- Main results (summarized from k6 logs):
   - Total Requests: ~22,170 (±52.65 req/s)
   - p95 `http_req_duration`: ~9.64 s
   - Error Rate: ~26.85%
-  - p95 `login_duration`: ~11.55 s (indikasi bottleneck login atau DB/IO)
-  - p95 `archive_duration`: ~403 ms (bagian arsip relatif cepat; error `EOF` muncul saat beban tinggi)
+  - p95 `login_duration`: ~11.55 s (indicates login or DB/IO bottleneck)
+  - p95 `archive_duration`: ~403 ms (archive part relatively fast; `EOF` errors appear under high load)
 
-| Metrik | Nilai |
+| Metric | Value |
 |---|---|
 | VUs max | 300 |
-| Durasi | ~7m |
+| Duration | ~7m |
 | Total Requests | ~22,170 |
 | Request/s | ~52.65 |
-| p95 Latensi | ~9.64 s |
+| p95 Latency | ~9.64 s |
 | Error Rate | ~26.85% |
 | p95 Login | ~11.55 s |
 | p95 Archive | ~403 ms |
 
-Visual ringkas proporsi error (estimatif):
+Visual summary of error proportion (estimated):
 ```mermaid
-pie title Komposisi Status (tinggi beban)
-  "Sukses" : 73
-  "Gagal" : 27
+pie title Status Composition (under high load)
+  "Success" : 73
+  "Failed" : 27
 ```
 
-## Observasi Kinerja & Bottleneck
-- Login menjadi bottleneck di beban tinggi (p95 > 10 s). Potensi penyebab:
-  - Hashing bcrypt tanpa pengaturan concurrency limit.
-  - Koneksi DB terbatas/pooling default belum dioptimasi.
-  - Tidak ada cache untuk profil/user claims.
-- Endpoint internal arsip sesekali gagal dengan `EOF` saat beban tinggi → indikasi kehabisan koneksi, timeout upstream, atau backpressure belum diatur.
-- Snapshot resource (saat uji): MySQL ~417 MB RAM, CPU ~2–5%; layanan Node RAM 35–80 MB; menunjukkan bottleneck bukan CPU-bound tetapi I/O/latensi eksternal.
+## Performance Observations & Bottlenecks
+### Load Level Selection Methodology
+- **Baseline (10 VUs)**: Represents normal usage of government licensing application with 5-15 concurrent users. Target p95 < 500ms to ensure good user experience under normal conditions.
+- **Stress (300 VUs)**: Simulates extreme conditions (30x baseline) to identify breaking points and bottlenecks before system collapse. Number 300 chosen because:
+  - High enough to trigger resource contention and queue buildup
+  - Still within reasonable bounds for single-host development environment
+  - Provides sufficient gradient to see performance degradation patterns
+  
+### Bottleneck Findings
+- Login becomes bottleneck under high load (p95 > 10 s). Potential causes:
+  - Bcrypt hashing without concurrency limit configuration.
+  - Limited DB connections/default pooling not optimized.
+  - No cache for profile/user claims.
+- Internal archive endpoint occasionally fails with `EOF` under high load → indicates running out of connections, upstream timeout, or backpressure not configured.
+- Resource snapshot (during test): MySQL ~417 MB RAM, CPU ~2–5%; Node services RAM 35–80 MB; shows bottleneck is not CPU-bound but I/O/external latency.
 
-## Evaluasi Interoperabilitas
-- Autentikasi lintas layanan via JWT: valid dan terverifikasi pada Pendaftaran/Survey/Archive.
-- Referensi entitas lintas DB: `permohonan_id` dari Pendaftaran digunakan di Survey dan Archive tanpa inkonsistensi.
-- Hak akses: `GET /api/arsip/:id` dibatasi role; percobaan akses Pemohon ditolak sesuai desain (perlu Admin/OPD/Pimpinan).
+## Interoperability Evaluation
+- Cross-service authentication via JWT: valid and verified across Application/Survey/Archive.
+- Cross-DB entity references: `permohonan_id` from Application used in Survey and Archive without inconsistency.
+- Access rights: `GET /api/arsip/:id` restricted by role; Applicant access attempts rejected as designed (requires Admin/OPD/Pimpinan).
 
-## Rekomendasi Peningkatan
-- Skalabilitas layanan:
-  - Tambah gateway/load balancer (Nginx/Traefik) agar scaling `auth` dan layanan lain dapat memanfaatkan multiple replicas (host port single saat ini membatasi scaling efektif).
-  - Aktifkan connection pooling eksplisit (Sequelize: `pool.max`, `acquire`, `idle`) dan naikan `max_connections` MySQL bila aman.
-  - Rate limit dan queue internal untuk endpoint `internal/arsipkan-dokumen` guna hindari `EOF`/timeout di burst tinggi.
-  - Kurangi biaya login: atur `bcrypt` cost factor yang seimbang atau gunakan worker threads; tambahkan cache session/claims (Redis) untuk read-heavy.
-  - Observability: tambahkan tracing (OpenTelemetry), metrics (Prometheus), dan log korrelasi antar layanan.
-- Interoperabilitas:
-  - Tambahkan contract tests (Pact) untuk antar layanan.
-  - Endpoint internal sebaiknya dibelakangi message broker (RabbitMQ/Kafka) agar lebih tahan beban dan reliabel.
+## Improvement Recommendations
+- Service scalability:
+  - Add gateway/load balancer (Nginx/Traefik) so scaling `auth` and other services can utilize multiple replicas (current single host port limits effective scaling).
+  - Enable explicit connection pooling (Sequelize: `pool.max`, `acquire`, `idle`) and increase MySQL `max_connections` if safe.
+  - Rate limit and internal queue for `internal/arsipkan-dokumen` endpoint to avoid `EOF`/timeout on high bursts.
+  - Reduce login cost: configure balanced `bcrypt` cost factor or use worker threads; add session/claims cache (Redis) for read-heavy loads.
+  - Observability: add tracing (OpenTelemetry), metrics (Prometheus), and log correlation across services.
+- Interoperability:
+  - Add contract tests (Pact) between services.
+  - Internal endpoints should be backed by message broker (RabbitMQ/Kafka) for better load tolerance and reliability.
 
-## Cara Reproduksi Cepat (PowerShell)
+## Quick Reproduction Steps (PowerShell)
 ```powershell
-# 1) Jalankan stack
+# 1) Run stack
 docker-compose up -d --build
 
-# 2) Inisialisasi DB semua layanan
-./docker/setup-databases.ps1
+# 2) Initialize all service databases
+.\docker\setup-databases.ps1
 
-# 3) Login (Pemohon)
+# 3) Login (Applicant)
 Invoke-RestMethod -Uri "http://localhost:3001/api/auth/signin" -Method POST -ContentType "application/json" -Body '{"username":"pemohon_demo","password":"demo123"}'
 
-# 4) Buat permohonan
-$token = '<ACCESS_TOKEN_PEMOHON>'
+# 4) Create application
+$token = '<APPLICANT_ACCESS_TOKEN>'
 $perm = @{user_id=1; data_pemohon=@{jenis_izin="SIPPT"; nama="Pemohon Demo"}} | ConvertTo-Json -Depth 3
 Invoke-RestMethod -Uri "http://localhost:3010/api/permohonan" -Method POST -Headers @{Authorization="Bearer $token"} -ContentType "application/json" -Body $perm
 
 # 5) Submit SKM
-$skm = @{permohonan_id=1; user_id=1; jawaban_json=@{nilai_1=4;niali_2=5}} | ConvertTo-Json -Depth 3
+$skm = @{permohonan_id=1; user_id=1; jawaban_json=@{nilai_1=4;nilai_2=5}} | ConvertTo-Json -Depth 3
 Invoke-RestMethod -Uri "http://localhost:3030/api/skm/submit" -Method POST -Headers @{Authorization="Bearer $token"} -ContentType "application/json" -Body $skm
 
-# 6) Arsipkan (internal)
+# 6) Archive (internal)
 Invoke-RestMethod -Uri "http://localhost:3040/api/internal/arsipkan-dokumen" -Method POST -ContentType "application/json" -Body '{"permohonan_id":1,"nomor_izin":"SIPPT/001/2025"}'
 
 # 7) k6 baseline
 cd tests; k6 run loadtest-baseline.js
 
-# 8) k6 stress (menyimpan raw events JSON)
+# 8) k6 stress (saves raw events JSON)
 k6 run loadtest-stress.js --out json=stress-results.json
 ```
 
-## Lampiran
-- Artefak: `tests/stress-results.json` (hasil raw events k6 stress test).
-- Skrip uji: `tests/loadtest-baseline.js`, `tests/loadtest-stress.js`, `tests/test-e2e-integration.js`.
-- Health endpoints: semua layanan memiliki `GET /health` untuk readiness checks.
+## Appendices
+- Artifacts: `tests/stress-results.json` (raw k6 stress test events).
+- Test scripts: `tests/loadtest-baseline.js`, `tests/loadtest-stress.js`, `tests/test-e2e-integration.js`.
+- Health endpoints: all services have `GET /health` for readiness checks.
 
 ---
-Kesimpulan: Implementasi microservices telah berfungsi secara end-to-end dengan interoperabilitas yang baik. Pada baseline, performa responsif; pada stress, bottleneck utama pada login dan internal archive saat beban tinggi. Optimasi dan arsitektur scaling (gateway, pooling, broker) direkomendasikan sebelum uji skala lebih lanjut.
+**Conclusion**: Microservices implementation is functionally end-to-end with good interoperability. At baseline, performance is responsive; under stress, main bottlenecks are login and internal archive under high load. Optimization and scaling architecture (gateway, pooling, broker) recommended before further scale testing.
