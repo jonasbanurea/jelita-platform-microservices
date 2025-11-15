@@ -30,7 +30,7 @@ services:
       PMA_HOST: mysql
       PMA_PORT: 3306
       PMA_USER: root
-      PMA_PASSWORD: Enter*123
+      PMA_PASSWORD: *******
     ports:
       - "8080:80"
     depends_on:
@@ -52,7 +52,7 @@ services:
       DB_USER: root
       DB_PASSWORD: *******
       DB_NAME: jelita_users
-      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
+      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78o*******AjzSPqYXvoyP02N*******
       NODE_ENV: production
     ports:
       - "3001:3001"
@@ -81,7 +81,7 @@ services:
       DB_USER: root
       DB_PASSWORD: *******
       DB_NAME: jelita_pendaftaran
-      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
+      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78o*******AjzSPqYXvoyP02N*******
       AUTH_SERVICE_URL: http://auth-service:3001
       NODE_ENV: production
     ports:
@@ -108,7 +108,7 @@ services:
       DB_USER: root
       DB_PASSWORD: *******
       DB_NAME: jelita_workflow
-      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
+      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78o*******AjzSPqYXvoyP02N*******
       AUTH_SERVICE_URL: http://auth-service:3001
       PENDAFTARAN_SERVICE_URL: http://pendaftaran-service:3010
       ARCHIVE_SERVICE_URL: http://archive-service:3040
@@ -137,7 +137,7 @@ services:
       DB_USER: root
       DB_PASSWORD: *******
       DB_NAME: jelita_survei
-      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
+      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78o*******AjzSPqYXvoyP02N*******
       AUTH_SERVICE_URL: http://auth-service:3001
       ARCHIVE_SERVICE_URL: http://archive-service:3040
       NODE_ENV: production
@@ -165,7 +165,7 @@ services:
       DB_USER: root
       DB_PASSWORD: *******
       DB_NAME: jelita_arsip
-      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
+      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78o*******AjzSPqYXvoyP02N*******
       AUTH_SERVICE_URL: http://auth-service:3001
       NODE_ENV: production
     ports:
