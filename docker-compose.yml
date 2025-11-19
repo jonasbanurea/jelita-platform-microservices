@@ -5,7 +5,7 @@ services:
     container_name: jelita-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: Enter*123
+      MYSQL_ROOT_PASSWORD: *******
       MYSQL_CHARACTER_SET_SERVER: utf8mb4
       MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
     ports:
@@ -16,7 +16,7 @@ services:
     networks:
       - jelita-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pEnter*123"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p*******"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -30,7 +30,7 @@ services:
       PMA_HOST: mysql
       PMA_PORT: 3306
       PMA_USER: root
-      PMA_PASSWORD: Enter*123
+      PMA_PASSWORD: *******
     ports:
       - "8080:80"
     depends_on:
@@ -50,9 +50,9 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: root
-      DB_PASSWORD: Enter*123
+      DB_PASSWORD: *******
       DB_NAME: jelita_users
-      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
+      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78o*******AjzSPqYXvoyP02N*******
       NODE_ENV: production
     ports:
       - "3001:3001"
@@ -79,9 +79,9 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: root
-      DB_PASSWORD: Enter*123
+      DB_PASSWORD: *******
       DB_NAME: jelita_pendaftaran
-      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
+      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78o*******AjzSPqYXvoyP02N*******
       AUTH_SERVICE_URL: http://auth-service:3001
       NODE_ENV: production
     ports:
@@ -106,9 +106,9 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: root
-      DB_PASSWORD: Enter*123
+      DB_PASSWORD: *******
       DB_NAME: jelita_workflow
-      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
+      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78o*******AjzSPqYXvoyP02N*******
       AUTH_SERVICE_URL: http://auth-service:3001
       PENDAFTARAN_SERVICE_URL: http://pendaftaran-service:3010
       ARCHIVE_SERVICE_URL: http://archive-service:3040
@@ -135,9 +135,9 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: root
-      DB_PASSWORD: Enter*123
+      DB_PASSWORD: *******
       DB_NAME: jelita_survei
-      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
+      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78o*******AjzSPqYXvoyP02N*******
       AUTH_SERVICE_URL: http://auth-service:3001
       ARCHIVE_SERVICE_URL: http://archive-service:3040
       NODE_ENV: production
@@ -163,9 +163,9 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: root
-      DB_PASSWORD: Enter*123
+      DB_PASSWORD: *******
       DB_NAME: jelita_arsip
-      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
+      JWT_SECRET: FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78o*******AjzSPqYXvoyP02N*******
       AUTH_SERVICE_URL: http://auth-service:3001
       NODE_ENV: production
     ports:

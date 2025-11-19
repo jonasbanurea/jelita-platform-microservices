@@ -78,7 +78,7 @@ See complete analysis: [TESTING_REPORT.md](TESTING_REPORT.md)
 
 ### Communication Patterns
 
-- **Synchronous**: REST APIs dengan JWT authentication
+- **Synchronous**: REST APIs with JWT authentication
 - **Asynchronous**: Internal service-to-service calls (no auth)
 - **Data**: Database per service (polyglot persistence)
 
@@ -186,7 +186,7 @@ docker-compose logs -f
 
 # Verify via phpMyAdmin (optional)
 # Browser: http://localhost:8080
-# User: root / Password: Enter*123
+# User: root / Password: *******
 ```
 
 ### 5. Verify Services
@@ -206,7 +206,7 @@ curl http://localhost:3040/health  # Archive
 # Login test
 curl -X POST http://localhost:3001/api/auth/login `
   -H "Content-Type: application/json" `
-  -d '{"username":"demo","password":"demo123"}'
+  -d '{"username":"demo","password":"*******"}'
 
 # Save token from response
 # Use token for subsequent requests

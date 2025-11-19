@@ -145,12 +145,12 @@ docker-compose logs -f
 # Test Auth Service - Login
 curl -X POST http://localhost:3001/api/auth/login `
   -H "Content-Type: application/json" `
-  -d '{"username":"demo","password":"demo123"}'
+  -d '{"username":"demo","password":"******"}'
 
 # Option 3: Gunakan curl.exe (bukan alias PowerShell)
 curl.exe -X POST http://localhost:3001/api/auth/login `
   -H "Content-Type: application/json" `
-  -d '{"username":"demo","password":"demo123"}'
+  -d '{"username":"demo","password":"******"}'
 
 # Output: {"success":true,"token":"eyJhbGc..."}
 ```
@@ -160,7 +160,7 @@ curl.exe -X POST http://localhost:3001/api/auth/login `
 Buka browser: **http://localhost:8080**
 - Server: `mysql`
 - Username: `root`
-- Password: `Enter*123`
+- Password: `*******`
 
 ---
 
@@ -177,7 +177,7 @@ Pastikan semua file `.env` di setiap service sudah di-update untuk Docker:
 DB_HOST=mysql          # Bukan localhost!
 DB_PORT=3306
 DB_USER=root
-DB_PASSWORD=Enter*123
+DB_PASSWORD=*******
 JWT_SECRET=FFbdqS6NVE7ARw08MNUAj0+sqXo7ZCEbZF7igEbMUH6tni78oAjzSPqYXvoyP02N
 ```
 
@@ -274,7 +274,7 @@ Membuktikan bahwa sistem microservices dapat berkomunikasi antar layanan (servic
 1. **Login sebagai Admin**
    ```
    POST http://localhost:3001/api/auth/login
-   Body: {"username":"demo","password":"demo123"}
+   Body: {"username":"demo","password":"*******"}
    ```
    Simpan `token` dari response.
 
@@ -382,7 +382,7 @@ export let options = {
 export default function() {
   // Login
   let loginRes = http.post('http://localhost:3001/api/auth/login', 
-    JSON.stringify({username: 'demo', password: 'demo123'}),
+    JSON.stringify({username: 'demo', password: '*******'}),
     { headers: { 'Content-Type': 'application/json' }}
   );
   
