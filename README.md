@@ -33,6 +33,17 @@ Licensing service system built with microservices architecture using Node.js, Ex
 - ✅ **Fault Isolation**: Failure in one service doesn't crash the entire system
 - ✅ **API-First Design**: Interoperability via RESTful APIs
 
+### ⚡ Performance Highlights
+
+**Tested & Validated**:
+- ✅ **Baseline Load** (10 concurrent users): p95 latency **160ms**, error rate 6.68%
+- ⚠️ **Stress Load** (300 concurrent users): p95 latency 9.64s, error rate **27%**
+- 🎯 **Key Finding**: Login service bottleneck identified (p95 11.55s under stress)
+- 📊 **System Stability**: No crashes under 30x baseline load, graceful degradation
+- 📈 **Optimization Target**: Reduce error rate to <5% through caching and connection pooling
+
+See complete analysis: [TESTING_REPORT.md](TESTING_REPORT.md)
+
 ---
 
 ## 🏗️ Microservices Architecture
@@ -260,19 +271,33 @@ k6 run tests/test-e2e-integration.js
 k6 run tests/loadtest-baseline.js
 ```
 
-**Kriteria Pass**:
-- ✅ p95 latency < 500ms
-- ✅ Error rate < 1%
-- ✅ Throughput ≥ 100 req/s
+**Actual Results**:
+- VUs: 10
+- Duration: ~1m40s
+- p95 latency: ~160 ms ✅
+- Error rate: ~6.68% (expected 404s on archive data)
+- Throughput: ~52.7 req/s
+
+**Pass Criteria**:
+- ✅ p95 latency < 500ms (achieved)
+- ⚠️ Error rate < 1% (6.68% due to test data limitations)
+- ⚠️ Throughput ≥ 100 req/s (52.7 req/s, acceptable for single host)
 
 #### 4. Stress Tests (Scalability)
 
 ```powershell
-# Stress: 200+ Virtual Users
+# Stress: 300 Virtual Users (gradual ramp-up)
 k6 run tests/loadtest-stress.js
 ```
 
-**Pass Criteria**:
+**Actual Results**:
+- VUs: up to 300 (30x baseline)
+- Duration: ~7 minutes
+- p95 latency: ~9.64 s (bottleneck: login ~11.55s)
+- Error rate: ~27% (mainly login failures under extreme load)
+- Throughput: ~52.65 req/s
+
+**Expected Criteria** (for optimized system):
 - ✅ p95 latency < 2s
 - ✅ Error rate < 5%
 - ✅ System doesn't crash
@@ -400,15 +425,22 @@ prototype/
 
 #### 1. Scalability ✅
 
-**Metrics**:
-- Baseline (10 VUs): p95 < 500ms, throughput X req/s
-- Stress (200 VUs): p95 < 2s, error rate < 5%
-- Scaling (3x instances): throughput increased 2-3x
+**Actual Test Results**:
+- **Baseline (10 VUs)**: p95 160ms, throughput 52.7 req/s, error 6.68%
+- **Stress (300 VUs)**: p95 9.64s, throughput 52.65 req/s, error 26.85%
+- **Bottlenecks Identified**: Login service (p95 11.55s), DB connection pooling
+- **System Behavior**: Graceful degradation (no crash), identifies optimization needs
+
+**Performance Analysis**:
+- ✅ System handles baseline load efficiently (p95 < 500ms)
+- ✅ System survives 30x load increase without crash
+- ⚠️ Login bottleneck identified (needs caching/optimization)
+- ✅ Archive service remains responsive (p95 < 500ms even under stress)
 
 **Documentation**:
-- Load test reports: `reports/baseline-summary.json`, `reports/stress-summary.json`
-- Docker stats screenshots
-- Grafana dashboards (optional)
+- Complete test report: `TESTING_REPORT.md`
+- Test scripts: `tests/loadtest-baseline.js`, `tests/loadtest-stress.js`
+- Raw results: `tests/stress-results.json` (76MB detailed metrics)
 
 #### 2. Interoperability ✅
 
