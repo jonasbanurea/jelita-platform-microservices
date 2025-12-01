@@ -1,6 +1,4 @@
-# ✅ SETUP SELESAI - Docker Deployment Jelita Microservices
-
-## 🎉 Yang Sudah Dibuat
+# ✅ Docker Deployment Jelita Microservices
 
 ### 1. Docker Configuration (✅ Complete)
 
