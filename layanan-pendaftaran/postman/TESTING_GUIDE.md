@@ -1,24 +1,24 @@
-# Panduan Pengujian Application Service dengan Postman
+# Testing Guide for Application Service with Postman
 
-## Daftar Isi
-1. [Persiapan](#persiapan)
+## Table of Contents
+1. [Preparation](#preparation)
 2. [Import Collection & Environment](#import-collection--environment)
 3. [Workflow Testing](#workflow-testing)
-4. [Testing Setiap Endpoint](#testing-setiap-endpoint)
+4. [Testing Each Endpoint](#testing-each-endpoint)
 5. [Troubleshooting](#troubleshooting)
 
 ---
 
-## Persiapan
+## Preparation
 
 ### 1. Install Dependencies
 ```powershell
-cd d:\KULIAH\TESIS\prototype\layanan-pendaftaran
+cd d:\KULIAH\TESIS\prototype_eng\layanan-pendaftaran
 npm install
 ```
 
-### 2. Konfigurasi Database
-Pastikan database MySQL sudah berjalan dan sesuaikan file `.env`:
+### 2. Database Configuration
+Ensure MySQL database is running and adjust the `.env` file:
 
 ```properties
 PORT=3010
@@ -32,7 +32,7 @@ UPLOAD_PATH=./uploads
 MAX_FILE_SIZE=5242880
 ```
 
-### 3. Buat Database dan Tables
+### 3. Create Database and Tables
 ```sql
 CREATE DATABASE IF NOT EXISTS jelita_permohonan;
 USE jelita_permohonan;
@@ -66,43 +66,43 @@ CREATE TABLE IF NOT EXISTS dokumen (
 );
 ```
 
-### 4. Jalankan Server
+### 4. Run Server
 ```powershell
-cd d:\KULIAH\TESIS\prototype\layanan-pendaftaran
+cd d:\KULIAH\TESIS\prototype_eng\layanan-pendaftaran
 node server.js
 ```
 
-Pastikan muncul: `Application Service is running on port 3010`
+Ensure the message appears: `Application Service is running on port 3010`
 
 ---
 
 ## Import Collection & Environment
 
 ### Import Files
-1. Buka Postman
-2. Klik **Import**
-3. Pilih kedua file:
+1. Open Postman
+2. Click **Import**
+3. Select both files:
    - `postman/Application_Service.postman_collection.json`
    - `postman/Application_Service.postman_environment.json`
-4. Klik **Import**
+4. Click **Import**
 
-### Aktifkan Environment
-1. Klik dropdown Environment (kanan atas)
-2. Pilih **Application Service - Development**
+### Activate Environment
+1. Click Environment dropdown (top right)
+2. Select **Application Service - Development**
 
 ---
 
 ## Workflow Testing
 
-### Skenario Lengkap (Happy Path)
+### Complete Scenario (Happy Path)
 
 ```mermaid
 graph TD
-    A[1. Login ke User Service] --> B[2. Create Permohonan]
+    A[1. Login to User Service] --> B[2. Create Application]
     B --> C[3. Upload Dokumen]
     C --> D[4. Verify Dokumen Admin/OPD]
     D --> E{Dokumen Valid?}
-    E -->|No| F[5. Send Notifikasi Perbaikan]
+    E -->|No| F[5. Send Correction Notification]
     F --> C
     E -->|Yes| G[6. Finalize & Register]
     G --> H[7. Generate Tanda Terima]
@@ -111,16 +111,16 @@ graph TD
 
 ### Step-by-Step Testing Flow
 
-**IMPORTANT:** Jalankan endpoint dalam urutan ini:
+**IMPORTANT:** Run endpoints in this order:
 
-1. **Prerequisite**: Login di User Service (port 3005/3001)
+1. **Prerequisite**: Login to User Service (port 3005/3001)
    - Endpoint: `POST /api/auth/signin`
-   - Dapatkan token dan simpan ke environment variable
+   - Obtain token and save to environment variable
 
-2. Create New Permohonan (Pemohon)
-3. Upload Document (Pemohon)
+2. Create New Application (Applicant)
+3. Upload Document (Applicant)
 4. Verify Document (Admin/OPD)
-5. (Optional) Send Correction Notification jika ada masalah
+5. (Optional) Send Correction Notification if there are issues
 6. Finalize & Register (Admin/OPD)
 7. Generate PDF Receipt
 8. Trigger Workflow Service
@@ -128,25 +128,25 @@ graph TD
 
 ---
 
-## Testing Setiap Endpoint
+## Testing Each Endpoint
 
-### Prerequisite: Mendapatkan Token
+### Prerequisite: Obtaining Token
 
-**PENTING**: Sebelum testing, Anda harus mendapatkan token dari **User & Auth Service**.
+**IMPORTANT**: Before testing, you must obtain a token from **User & Auth Service**.
 
-#### Cara 1: Menggunakan Postman Collection User Service
+#### Method 1: Using Postman Collection User Service
 ```powershell
-# Jalankan User Service di port berbeda
-cd d:\KULIAH\TESIS\prototype\layanan-manajemen-pengguna
+# Run User Service on different port
+cd d:\KULIAH\TESIS\prototype_eng\layanan-manajemen-pengguna
 $env:PORT=3001; node server.js
 ```
 
-Lalu di Postman:
+Then in Postman:
 - Import collection User Auth Service
-- Jalankan **Sign In** dengan credentials: `demo / demo123`
-- Token akan otomatis tersimpan di `AUTH_HEADER`
+- Run **Sign In** with credentials: `demo / demo123`
+- Token will be automatically saved to `AUTH_HEADER`
 
-#### Cara 2: Manual dengan PowerShell
+#### Method 2: Manual with PowerShell
 ```powershell
 $body = @{ username='demo'; password='demo123' } | ConvertTo-Json
 $response = Invoke-RestMethod -Method Post -Uri http://localhost:3001/api/auth/signin -Body $body -ContentType 'application/json'
@@ -154,13 +154,13 @@ $token = "Bearer " + $response.accessToken
 Write-Host $token
 ```
 
-Copy token dan paste ke environment variable `AUTH_HEADER`.
+Copy token and paste to environment variable `AUTH_HEADER`.
 
 ---
 
-### 1. POST /api/permohonan - Create New Permohonan
+### 1. POST /api/permohonan - Create New Application
 
-**Role:** Pemohon (authenticated user)
+**Role:** Applicant (authenticated user)
 
 **Request:**
 ```json
@@ -183,7 +183,7 @@ Copy token dan paste ke environment variable `AUTH_HEADER`.
 **Expected Response (201 Created):**
 ```json
 {
-    "message": "Permohonan created successfully",
+    "message": "Application created successfully",
     "data": {
         "id": 1,
         "user_id": 1,
@@ -200,13 +200,13 @@ Copy token dan paste ke environment variable `AUTH_HEADER`.
 }
 ```
 
-**Auto-save:** `PERMOHONAN_ID` tersimpan otomatis ke environment
+**Auto-save:** `PERMOHONAN_ID` automatically saved to environment
 
 ---
 
-### 2. PUT /api/permohonan/:id - Update Permohonan
+### 2. PUT /api/permohonan/:id - Update Application
 
-**Role:** Pemohon (owner) atau Admin/OPD
+**Role:** Applicant (owner) or Admin/OPD
 
 **URL:** `{{BASE_URL}}/api/permohonan/{{PERMOHONAN_ID}}`
 
@@ -227,7 +227,7 @@ Copy token dan paste ke environment variable `AUTH_HEADER`.
 **Expected Response (200 OK):**
 ```json
 {
-    "message": "Permohonan updated successfully",
+    "message": "Application updated successfully",
     "data": {
         "id": 1,
         "user_id": 1,
@@ -238,8 +238,8 @@ Copy token dan paste ke environment variable `AUTH_HEADER`.
 ```
 
 **Access Control:**
-- Owner dapat update permohonan mereka sendiri
-- Admin/OPD dapat update semua permohonan
+- Owner can update their own application
+- Admin/OPD can update all applications
 
 ---
 
@@ -281,20 +281,20 @@ Copy token dan paste ke environment variable `AUTH_HEADER`.
 - Images: `.jpeg`, `.jpg`, `.png`
 - Documents: `.pdf`, `.doc`, `.docx`
 
-**Auto-save:** `DOKUMEN_ID` tersimpan otomatis
+**Auto-save:** `DOKUMEN_ID` automatically saved
 
-**Cara Upload di Postman:**
-1. Pilih tab **Body**
-2. Pilih **form-data**
+**How to Upload in Postman:**
+1. Select tab **Body**
+2. Select **form-data**
 3. Key: `file`, Type: **File**, Value: [Select Files]
 4. Key: `jenis_dokumen`, Type: **Text**, Value: `KTP`
-5. Klik **Send**
+5. Click **Send**
 
 ---
 
 ### 4. POST /api/dokumen/:id/verifikasi - Verify Document
 
-**Role:** Admin atau OPD only
+**Role:** Admin or OPD only
 
 **URL:** `{{BASE_URL}}/api/dokumen/{{DOKUMEN_ID}}/verifikasi`
 
@@ -317,28 +317,28 @@ Copy token dan paste ke environment variable `AUTH_HEADER`.
     "data": {
         "id": 1,
         "status_verifikasi": "verified",
-        "catatan_verifikasi": "Dokumen lengkap dan sesuai",
+        "catatan_verifikasi": "Documents are complete and appropriate",
         "verified_by": 2,
         "verified_at": "2025-11-11T10:10:00.000Z"
     }
 }
 ```
 
-**Note:** Jika role bukan Admin/OPD, akan return **403 Forbidden**
+**Note:** If role is not Admin/OPD, will return **403 Forbidden**
 
 ---
 
 ### 5. POST /api/permohonan/:id/notifikasi-perbaikan - Send Correction Notification
 
-**Role:** Admin atau OPD only
+**Role:** Admin or OPD only
 
 **URL:** `{{BASE_URL}}/api/permohonan/{{PERMOHONAN_ID}}/notifikasi-perbaikan`
 
 **Request:**
 ```json
 {
-    "pesan": "Permohonan Anda memerlukan perbaikan",
-    "catatan": "Mohon lengkapi dokumen KTP dan Surat Kuasa"
+    "pesan": "Your application requires corrections",
+    "catatan": "Please complete KTP document and Power of Attorney"
 }
 ```
 
@@ -349,8 +349,8 @@ Copy token dan paste ke environment variable `AUTH_HEADER`.
     "data": {
         "permohonan_id": 1,
         "user_id": 1,
-        "pesan": "Permohonan Anda memerlukan perbaikan",
-        "catatan": "Mohon lengkapi dokumen KTP dan Surat Kuasa",
+        "pesan": "Your application requires corrections",
+        "catatan": "Please complete KTP document and Power of Attorney",
         "dikirim_oleh": 2,
         "tanggal_kirim": "2025-11-11T10:15:00.000Z"
     }
@@ -358,14 +358,14 @@ Copy token dan paste ke environment variable `AUTH_HEADER`.
 ```
 
 **Side Effect:**
-- Status permohonan berubah menjadi `perlu_perbaikan`
-- Dalam implementasi nyata, akan mengirim email/SMS ke pemohon
+- Application status changes to `perlu_perbaikan`
+- In real implementation, will send email/SMS to applicant
 
 ---
 
 ### 6. POST /api/permohonan/:id/registrasi - Finalize & Register
 
-**Role:** Admin atau OPD only
+**Role:** Admin or OPD only
 
 **URL:** `{{BASE_URL}}/api/permohonan/{{PERMOHONAN_ID}}/registrasi`
 
@@ -384,21 +384,21 @@ Copy token dan paste ke environment variable `AUTH_HEADER`.
 ```
 
 **Registration Number Format:** `REG/YYYY/MM/XXXX`
-- YYYY = Tahun
-- MM = Bulan (01-12)
+- YYYY = Year
+- MM = Month (01-12)
 - XXXX = Random 4-digit number
 
-**Auto-save:** `NOMOR_REGISTRASI` tersimpan otomatis
+**Auto-save:** `NOMOR_REGISTRASI` automatically saved
 
 **Note:**
-- Hanya bisa dilakukan sekali per permohonan
-- Jika sudah terdaftar, akan return error
+- Can only be done once per application
+- If already registered, will return error
 
 ---
 
 ### 7. GET /api/permohonan/:id/tanda-terima - Generate PDF Receipt
 
-**Role:** Pemohon (owner) atau Admin/OPD
+**Role:** Applicant (owner) or Admin/OPD
 
 **URL:** `{{BASE_URL}}/api/permohonan/{{PERMOHONAN_ID}}/tanda-terima`
 
@@ -412,23 +412,23 @@ Copy token dan paste ke environment variable `AUTH_HEADER`.
 - Content-Disposition: `attachment; filename=tanda-terima-REG-2025-11-0123.pdf`
 - Binary PDF data
 
-**Cara Test di Postman:**
-1. Klik **Send**
-2. Response akan menampilkan PDF preview
-3. Klik **Save Response** → **Save to a file** untuk download
+**How to Test in Postman:**
+1. Click **Send**
+2. Response will display PDF preview
+3. Click **Save Response** → **Save to a file** to download
 
-**Cara Test via Browser:**
+**How to Test via Browser:**
 ```
 http://localhost:3010/api/permohonan/1/tanda-terima?token=YOUR_JWT_TOKEN
 ```
 
-**Note:** Permohonan harus sudah memiliki `nomor_registrasi` (sudah finalize)
+**Note:** Application must already have `nomor_registrasi` (already finalized)
 
 ---
 
 ### 8. GET /api/permohonan/:id/status - Get Application Status
 
-**Role:** Pemohon (owner) atau Admin/OPD/Pimpinan
+**Role:** Applicant (owner) or Admin/OPD/Leadership
 
 **URL:** `{{BASE_URL}}/api/permohonan/{{PERMOHONAN_ID}}/status`
 
@@ -449,12 +449,12 @@ http://localhost:3010/api/permohonan/1/tanda-terima?token=YOUR_JWT_TOKEN
 ```
 
 **Status Values:**
-- `draft` - Baru dibuat, belum lengkap
-- `perlu_perbaikan` - Butuh revisi dari pemohon
-- `menunggu_verifikasi` - Dokumen dalam proses verifikasi
-- `terdaftar` - Sudah finalize dan dapat nomor registrasi
-- `diproses` - Dalam proses workflow teknis
-- `selesai` - Proses selesai
+- `draft` - Newly created, not yet complete
+- `perlu_perbaikan` - Requires revision from applicant
+- `menunggu_verifikasi` - Documents in verification process
+- `terdaftar` - Already finalized and received registration number
+- `diproses` - In technical workflow process
+- `selesai` - Process completed
 
 ---
 
@@ -484,56 +484,56 @@ http://localhost:3010/api/permohonan/1/tanda-terima?token=YOUR_JWT_TOKEN
 ```
 
 **Note:**
-- Endpoint ini untuk komunikasi antar microservice
-- Akan memanggil Workflow Service di `http://localhost:3020`
-- Jika Workflow Service belum jalan, akan return error
+- This endpoint is for inter-microservice communication
+- Will call Workflow Service at `http://localhost:3020`
+- If Workflow Service is not running, will return error
 
 ---
 
 ## Troubleshooting
 
 ### Problem: 401 Unauthorized - No token provided
-**Solusi:**
-- Pastikan sudah login ke User Service terlebih dahulu
-- Copy token dari response signin
-- Paste ke environment variable `AUTH_HEADER` dengan format: `Bearer <token>`
+**Solution:**
+- Ensure you have logged in to User Service first
+- Copy token from signin response
+- Paste to environment variable `AUTH_HEADER` with format: `Bearer <token>`
 
 ### Problem: 403 Forbidden - Access denied
-**Solusi:**
-- Endpoint memerlukan role tertentu (Admin/OPD)
-- Login dengan user yang memiliki role Admin atau OPD
-- Cek JWT payload untuk memastikan role sudah benar
+**Solution:**
+- Endpoint requires specific role (Admin/OPD)
+- Login with user who has Admin or OPD role
+- Check JWT payload to ensure role is correct
 
 ### Problem: 404 Not Found - Application not found
-**Solusi:**
-- Pastikan `PERMOHONAN_ID` sudah ter-set di environment variable
-- Cek apakah permohonan dengan ID tersebut ada di database
-- Create permohonan baru jika belum ada
+**Solution:**
+- Ensure `PERMOHONAN_ID` is set in environment variable
+- Check if application with that ID exists in database
+- Create new application if it doesn't exist yet
 
 ### Problem: 400 Bad Request - File upload error
-**Solusi:**
-- Pastikan file size tidak melebihi 5MB
-- File type harus: jpeg, jpg, png, pdf, doc, docx
-- Di Postman, pilih body type **form-data** bukan **raw**
-- Key harus bernama `file` dan type harus **File**
+**Solution:**
+- Ensure file size does not exceed 5MB
+- File type must be: jpeg, jpg, png, pdf, doc, docx
+- In Postman, select body type **form-data** not **raw**
+- Key must be named `file` and type must be **File**
 
 ### Problem: 500 Internal Server Error - Database connection
-**Solusi:**
-- Cek apakah MySQL service berjalan
-- Verifikasi credentials di file `.env`
-- Pastikan database `jelita_permohonan` sudah dibuat
-- Jalankan SQL script untuk membuat tables
+**Solution:**
+- Check if MySQL service is running
+- Verify credentials in `.env` file
+- Ensure database `jelita_permohonan` has been created
+- Run SQL script to create tables
 
 ### Problem: Cannot generate PDF - No nomor_registrasi
-**Solusi:**
-- Permohonan harus sudah finalize terlebih dahulu
-- Jalankan endpoint **Finalize & Register** dulu
-- Pastikan status sudah `terdaftar`
+**Solution:**
+- Application must be finalized first
+- Run endpoint **Finalize & Register** first
+- Ensure status is already `terdaftar`
 
 ### Problem: File upload folder not found
-**Solusi:**
+**Solution:**
 ```powershell
-cd d:\KULIAH\TESIS\prototype\layanan-pendaftaran
+cd d:\KULIAH\TESIS\prototype_eng\layanan-pendaftaran
 mkdir uploads
 ```
 
@@ -556,12 +556,12 @@ mkdir uploads
 
 ### Scenario 2: Revision Flow
 ```
-1. Create Permohonan ✓
+1. Create Application ✓
 2. Upload incomplete documents ✓
 3. Admin sends correction notification ✓
 4. Status changes to 'perlu_perbaikan' ✓
-5. Pemohon updates data ✓
-6. Pemohon uploads corrected documents ✓
+5. Applicant updates data ✓
+6. Applicant uploads corrected documents ✓
 7. Admin verifies again ✓
 8. Proceed to registration ✓
 ```
@@ -584,7 +584,7 @@ mkdir uploads
 | `BASE_URL` | No | Application service URL (default: http://localhost:3010) |
 | `AUTH_HEADER` | No (manual) | Bearer token from User Service |
 | `TOKEN` | No (manual) | Raw JWT token |
-| `PERMOHONAN_ID` | Yes | Auto-saved after creating permohonan |
+| `PERMOHONAN_ID` | Yes | Auto-saved after creating application |
 | `DOKUMEN_ID` | Yes | Auto-saved after uploading document |
 | `NOMOR_REGISTRASI` | Yes | Auto-saved after registration |
 
@@ -594,8 +594,8 @@ mkdir uploads
 
 | Endpoint | Method | Auth | Role | Description |
 |----------|--------|------|------|-------------|
-| `/api/permohonan` | POST | ✓ | Any | Create permohonan |
-| `/api/permohonan/:id` | PUT | ✓ | Owner/Admin/OPD | Update permohonan |
+| `/api/permohonan` | POST | ✓ | Any | Create application |
+| `/api/permohonan/:id` | PUT | ✓ | Owner/Admin/OPD | Update application |
 | `/api/permohonan/:id/dokumen` | POST | ✓ | Owner | Upload document |
 | `/api/dokumen/:id/verifikasi` | POST | ✓ | Admin/OPD | Verify document |
 | `/api/permohonan/:id/notifikasi-perbaikan` | POST | ✓ | Admin/OPD | Send notification |
