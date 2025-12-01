@@ -314,8 +314,6 @@ node server.js
 
 ---
 
-## 🎉 Happy Testing!
-
 All Workflow Service endpoints are ready to test.
 
 **Next Steps**:
