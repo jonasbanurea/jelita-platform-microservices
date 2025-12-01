@@ -1,4 +1,5 @@
-# 🏛️ Jelita Licensing Service - Microservices Architecture
+# 🏛️ Developing a Microservices-Based Licensing Platform for West Java Using
+the SCSE Framework
 
 > **Monolith to Microservices Transformation for Enhanced Scalability and Interoperability**
 
