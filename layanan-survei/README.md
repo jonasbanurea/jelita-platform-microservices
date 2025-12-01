@@ -1,6 +1,6 @@
 # 📊 Survey (SKM) Service - Jelita System
 
-Microservice untuk mengelola **Survei Kepuasan Masyarakat (SKM)** pada sistem perizinan Jelita.
+Microservice to manage **Citizen Satisfaction Survey (SKM)** in Jelita licensing system.
 
 ## 📋 Table of Contents
 - [Overview](#overview)
@@ -405,7 +405,7 @@ SKM Value = (Average Score / 4) × 100
 ### Service Quality Category
 
 | SKM Value | Category | Quality | Performance |
-|-----------|----------|------|---------||
+|-----------|----------|------|---------|
 | 88.31 - 100.00 | **Excellent** | A | Excellent |
 | 76.61 - 88.30 | **Good** | B | Good |
 | 65.00 - 76.60 | **Fair** | C | Fair |
