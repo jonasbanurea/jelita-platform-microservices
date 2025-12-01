@@ -1,37 +1,37 @@
-# Layanan Alur Kerja (Workflow Service)
+# Workflow Service
 
-Service untuk mengelola alur kerja internal pemrosesan permohonan izin dalam sistem Jelita.
+Service for managing internal workflow for permit application processing in the Jelita system.
 
-## 📋 Deskripsi
+## 📋 Description
 
-Workflow Service adalah microservice yang mengatur alur kerja internal untuk pemrosesan permohonan izin, meliputi:
+Workflow Service is a microservice that manages internal workflow for permit application processing, including:
 
-- **Disposisi ke OPD**: Admin menugaskan permohonan ke Organisasi Perangkat Daerah
-- **Kajian Teknis**: OPD melakukan review teknis dan memberikan rekomendasi
-- **Draft Izin**: Admin membuat draft surat izin dan mengirimkannya ke Pimpinan
-- **Revisi Draft**: Pimpinan meminta revisi terhadap draft izin
+- **Disposition to OPD**: Admin assigns application to Regional Apparatus Organization
+- **Technical Review**: OPD conducts technical review and provides recommendations
+- **Permit Draft**: Admin creates permit letter draft and sends it to Leadership
+- **Draft Revision**: Leadership requests revision to permit draft
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js v14 atau lebih tinggi
-- MySQL 8.0 atau lebih tinggi
-- User & Auth Service berjalan di port 3001
-- Application Service berjalan di port 3010
+- Node.js v14 or higher
+- MySQL 8.0 or higher
+- User & Auth Service running on port 3001
+- Application Service running on port 3010
 
 ### Installation
 
 ```bash
 # Clone repository
-cd d:\KULIAH\TESIS\prototype\layanan-alur-kerja
+cd d:\KULIAH\TESIS\prototype_eng\layanan-alur-kerja
 
 # Install dependencies
 npm install
 
 # Setup environment
 cp .env.example .env
-# Edit .env sesuai konfigurasi database Anda
+# Edit .env according to your database configuration
 
 # Create database
 node scripts/createDatabase.js
@@ -43,7 +43,7 @@ node scripts/setupDatabase.js
 npm start
 ```
 
-Server akan berjalan di `http://localhost:3020`
+Server will run at `http://localhost:3020`
 
 ## 📁 Project Structure
 
@@ -75,10 +75,10 @@ layanan-alur-kerja/
 
 ## 🔌 API Endpoints
 
-### 1. Create Disposisi OPD
+### 1. Create OPD Disposition
 **POST** `/api/workflow/disposisi-opd`  
 **Role**: Admin  
-**Description**: Membuat disposisi untuk menugaskan permohonan ke OPD
+**Description**: Create disposition to assign application to OPD
 
 **Request Body**:
 ```json
@@ -86,14 +86,14 @@ layanan-alur-kerja/
   "permohonan_id": 1,
   "nomor_registrasi": "REG/2024/01/0001",
   "opd_id": 2,
-  "catatan_disposisi": "Mohon segera dilakukan kajian teknis"
+  "catatan_disposisi": "Please conduct technical review immediately"
 }
 ```
 
-### 2. Input Kajian Teknis
+### 2. Input Technical Review
 **POST** `/api/workflow/kajian-teknis`  
 **Role**: OPD  
-**Description**: OPD melakukan input hasil kajian teknis
+**Description**: OPD inputs technical review results
 
 **Request Body**:
 ```json
@@ -101,20 +101,20 @@ layanan-alur-kerja/
   "permohonan_id": 1,
   "opd_id": 2,
   "hasil_kajian": "disetujui",
-  "rekomendasi": "Permohonan disetujui dengan catatan...",
-  "catatan_teknis": "Lokasi memenuhi syarat zonasi...",
+  "rekomendasi": "Application approved with notes...",
+  "catatan_teknis": "Location meets zoning requirements...",
   "lampiran": [
     {"nama_file": "survey.pdf", "url": "/uploads/survey.pdf"}
   ]
 }
 ```
 
-**Nilai `hasil_kajian`**: `disetujui` | `ditolak` | `perlu_revisi`
+**`hasil_kajian` values**: `disetujui` | `ditolak` | `perlu_revisi`
 
-### 3. Forward Draft to Pimpinan
+### 3. Forward Draft to Leadership
 **POST** `/api/workflow/forward-to-pimpinan`  
 **Role**: Admin  
-**Description**: Mengirim draft izin ke Pimpinan untuk review
+**Description**: Send permit draft to Leadership for review
 
 **Request Body**:
 ```json
@@ -122,27 +122,27 @@ layanan-alur-kerja/
   "permohonan_id": 1,
   "nomor_registrasi": "REG/2024/01/0001",
   "nomor_draft": "DRAFT/2024/01/0001",
-  "isi_draft": "KEPUTUSAN KEPALA DAERAH..."
+  "isi_draft": "REGIONAL HEAD DECISION..."
 }
 ```
 
-### 4. Request Revisi Draft
+### 4. Request Draft Revision
 **POST** `/api/workflow/revisi-draft`  
 **Role**: Pimpinan  
-**Description**: Pimpinan meminta revisi terhadap draft izin
+**Description**: Leadership requests revision to permit draft
 
 **Request Body**:
 ```json
 {
   "draft_id": 1,
-  "catatan_revisi": "Mohon perbaiki bagian pertimbangan hukum..."
+  "catatan_revisi": "Please revise the legal considerations section..."
 }
 ```
 
 ### 5. Receive Trigger (Internal)
 **POST** `/api/internal/receive-trigger`  
 **Auth**: No auth required (internal)  
-**Description**: Endpoint internal untuk menerima trigger dari Application Service
+**Description**: Internal endpoint to receive triggers from Application Service
 
 **Request Body**:
 ```json
@@ -155,12 +155,12 @@ layanan-alur-kerja/
 ## 🔐 Authentication & Authorization
 
 ### JWT Token
-Semua endpoint (kecuali internal) memerlukan JWT token di header:
+All endpoints (except internal) require JWT token in header:
 ```
 Authorization: Bearer <token>
 ```
 
-Token didapat dari User & Auth Service:
+Token obtained from User & Auth Service:
 ```http
 POST http://localhost:3001/api/auth/signin
 Content-Type: application/json
@@ -255,35 +255,35 @@ CREATE TABLE revisi_draft (
 ```
 1. Application Service triggers workflow
    ↓
-2. Admin creates Disposisi to OPD
+2. Admin creates Disposition to OPD
    ↓
-3. OPD performs Kajian Teknis
+3. OPD performs Technical Review
    ↓
-4. Admin creates Draft Izin
+4. Admin creates Permit Draft
    ↓
-5. Admin forwards Draft to Pimpinan
+5. Admin forwards Draft to Leadership
    ↓
-6a. Pimpinan approves (DONE)
+6a. Leadership approves (DONE)
    OR
-6b. Pimpinan requests revision → back to step 4
+6b. Leadership requests revision → back to step 4
 ```
 
 ## 🧪 Testing
 
 ### Postman Collection
-Import file berikut ke Postman:
+Import the following files to Postman:
 - Collection: `postman/Workflow_Service.postman_collection.json`
 - Environment: `postman/Workflow_Service.postman_environment.json`
 
 ### Testing Guide
-Baca dokumentasi lengkap di: `postman/TESTING_GUIDE.md`
+Read complete documentation at: `postman/TESTING_GUIDE.md`
 
 ### Manual Testing
 ```bash
 # Start server
 npm start
 
-# Test endpoint (gunakan Postman atau curl)
+# Test endpoint (use Postman or curl)
 curl -X POST http://localhost:3020/api/workflow/disposisi-opd \
   -H "Authorization: Bearer <your_token>" \
   -H "Content-Type: application/json" \
@@ -322,7 +322,7 @@ JWT_SECRET=your-super-secret-jwt-key-min-32-chars-1234567890abcdef
 
 ## 🐛 Troubleshooting
 
-### Server tidak bisa start
+### Server won't start
 ```bash
 # Check port availability
 netstat -ano | findstr :3020
@@ -345,9 +345,9 @@ node scripts/setupDatabase.js
 ```
 
 ### Token validation error
-- Pastikan User & Auth Service berjalan di port 3001
-- Pastikan JWT_SECRET sama dengan Auth Service
-- Token expired? Login ulang untuk mendapat token baru
+- Ensure User & Auth Service is running on port 3001
+- Ensure JWT_SECRET is the same as Auth Service
+- Token expired? Login again to get new token
 
 ## 📚 Related Services
 
@@ -367,8 +367,7 @@ MIT License
 
 ## 👤 Author
 
-Sistem Jelita - Layanan Perizinan Terpadu
+Jelita System - Integrated Licensing Service
 
 ---
 
-**Last Updated**: January 2024
