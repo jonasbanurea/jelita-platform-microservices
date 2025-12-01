@@ -406,6 +406,4 @@ If you have questions or issues:
 
 ---
 
-**All files are ready for deployment and testing! 🎉**
-
-**Good luck with your thesis testing! 🚀**
+**All files are ready for deployment and testing! **
