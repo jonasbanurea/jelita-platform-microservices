@@ -114,11 +114,11 @@ node scripts/setupDatabase.js
 | `workflow_base_url` | `http://localhost:3020` | Base URL Workflow Service |
 | `auth_base_url` | `http://localhost:3001` | Base URL Auth Service |
 | `application_base_url` | `http://localhost:3010` | Base URL Application Service |
-| `accessToken` | (auto-saved) | JWT token dari login |
-| `admin_username` | `demo` | Username untuk Admin |
-| `admin_password` | `demo123` | Password untuk Admin |
-| `permohonan_id` | (manual/auto) | ID permohonan dari Application Service |
-| `opd_user_id` | (manual) | ID user dengan role OPD |
+| `accessToken` | (auto-saved) | JWT token from login |
+| `admin_username` | `demo` | Username for Admin |
+| `admin_password` | `demo123` | Password for Admin |
+| `permohonan_id` | (manual/auto) | Application ID from Application Service |
+| `opd_user_id` | (manual) | User ID with OPD role |
 | `disposisi_id` | (auto-saved) | ID of created disposition |
 | `kajian_id` | (auto-saved) | ID of created technical review |
 | `draft_id` | (auto-saved) | ID of created permit draft |
@@ -179,7 +179,7 @@ CREATE TABLE disposisi (
   id INT PRIMARY KEY AUTO_INCREMENT,
   permohonan_id INT NOT NULL,
   nomor_registrasi VARCHAR(255),
-  opd_id INT NOT NULL COMMENT 'User ID dengan role OPD',
+  opd_id INT NOT NULL COMMENT 'User ID with OPD role',
   disposisi_dari INT NOT NULL COMMENT 'Admin User ID who created',
   catatan_disposisi TEXT,
   status ENUM('pending', 'dikerjakan', 'selesai', 'ditolak') DEFAULT 'pending',
@@ -195,7 +195,7 @@ CREATE TABLE kajian_teknis (
   id INT PRIMARY KEY AUTO_INCREMENT,
   permohonan_id INT NOT NULL,
   opd_id INT NOT NULL,
-  reviewer_id INT NOT NULL COMMENT 'User ID OPD yang review',
+  reviewer_id INT NOT NULL COMMENT 'User ID of OPD reviewer',
   hasil_kajian ENUM('disetujui', 'ditolak', 'perlu_revisi'),
   rekomendasi TEXT,
   catatan_teknis TEXT,
@@ -252,22 +252,22 @@ CREATE TABLE revisi_draft (
 | 1 | `/api/workflow/disposisi-opd` | POST | Admin | Create disposition to OPD |
 | 2 | `/api/workflow/kajian-teknis` | POST | OPD | Input technical review results |
 | 3 | `/api/workflow/forward-to-pimpinan` | POST | Admin | Send draft to Leadership |
-| 4 | `/api/workflow/revisi-draft` | POST | Pimpinan | Minta revisi draft |
-| 5 | `/api/internal/receive-trigger` | POST | Internal | Terima trigger dari App Service |
+| 4 | `/api/workflow/revisi-draft` | POST | Pimpinan | Request draft revision |
+| 5 | `/api/internal/receive-trigger` | POST | Internal | Receive trigger from App Service |
 
 ### 5.2 Authentication
-Semua endpoint (kecuali #5) menggunakan **Bearer Token** JWT di header:
+All endpoints (except #5) use JWT **Bearer Token** in header:
 ```
 Authorization: Bearer <accessToken>
 ```
 
-Token didapat dari endpoint `/api/auth/signin` di User & Auth Service (Port 3001).
+Token is obtained from endpoint `/api/auth/signin` in User & Auth Service (Port 3001).
 
 ---
 
 ## 6. Testing Step-by-Step
 
-### 6.1 Persiapan: Login & Dapatkan Token
+### 6.1 Preparation: Login & Get Token
 
 **Step 1: Start All Services**
 ```bash
@@ -284,9 +284,9 @@ cd d:\KULIAH\TESIS\prototype\layanan-alur-kerja
 npm start
 ```
 
-**Step 2: Login sebagai Admin**
+**Step 2: Login as Admin**
 
-Gunakan collection **User & Auth Service** di Postman:
+Use the **User & Auth Service** collection in Postman:
 - Request: `POST {{auth_base_url}}/api/auth/signin`
 - Body:
 ```json
@@ -307,7 +307,7 @@ Gunakan collection **User & Auth Service** di Postman:
 }
 ```
 
-✅ Token akan otomatis tersimpan di environment variable `accessToken`.
+✅ Token will be automatically saved to environment variable `accessToken`.
 
 ---
 
@@ -316,9 +316,9 @@ Gunakan collection **User & Auth Service** di Postman:
 **Objective**: Admin assigns application to OPD for technical review.
 
 **Prerequisites**:
-- ✅ Login sebagai Admin (token tersimpan)
-- ✅ Memiliki `permohonan_id` dari Application Service
-- ✅ Memiliki `opd_user_id` (ID user dengan role OPD)
+- ✅ Login as Admin (token saved)
+- ✅ Have `permohonan_id` from Application Service
+- ✅ Have `opd_user_id` (user ID with OPD role)
 
 **Request**:
 ```http
@@ -330,7 +330,7 @@ Content-Type: application/json
   "permohonan_id": 1,
   "nomor_registrasi": "REG/2024/01/0001",
   "opd_id": 2,
-  "catatan_disposisi": "Mohon segera dilakukan kajian teknis untuk permohonan ini"
+  "catatan_disposisi": "Please conduct technical review for this application immediately"
 }
 ```
 
@@ -344,7 +344,7 @@ Content-Type: application/json
     "nomor_registrasi": "REG/2024/01/0001",
     "opd_id": 2,
     "disposisi_dari": 1,
-    "catatan_disposisi": "Mohon segera dilakukan kajian teknis untuk permohonan ini",
+    "catatan_disposisi": "Please conduct technical review for this application immediately",
     "status": "pending",
     "tanggal_disposisi": "2024-01-15T10:30:00.000Z",
     "updated_at": "2024-01-15T10:30:00.000Z",
@@ -371,11 +371,11 @@ pm.environment.set("disposisi_id", pm.response.json().data.id);
 
 **Validation Points**:
 - ✅ Status code 201
-- ✅ Response memiliki `message` dan `data`
-- ✅ `status` bernilai `'pending'`
-- ✅ `disposisi_dari` terisi dengan ID user yang login (Admin)
-- ✅ `tanggal_disposisi` terisi otomatis
-- ✅ `disposisi_id` tersimpan di environment
+- ✅ Response has `message` and `data`
+- ✅ `status` value is `'pending'`
+- ✅ `disposisi_dari` filled with logged-in user ID (Admin)
+- ✅ `tanggal_disposisi` auto-filled
+- ✅ `disposisi_id` saved to environment
 
 ---
 
@@ -384,8 +384,8 @@ pm.environment.set("disposisi_id", pm.response.json().data.id);
 **Objective**: OPD conducts technical review and provides recommendations.
 
 **Prerequisites**:
-- ✅ Logout dari Admin, login sebagai **OPD**
-- ✅ Memiliki `permohonan_id` yang akan dikaji
+- ✅ Logout from Admin, login as **OPD**
+- ✅ Have `permohonan_id` to be reviewed
 
 **Request**:
 ```http
@@ -397,8 +397,8 @@ Content-Type: application/json
   "permohonan_id": 1,
   "opd_id": 2,
   "hasil_kajian": "disetujui",
-  "rekomendasi": "Permohonan disetujui dengan catatan untuk memperhatikan aspek lingkungan",
-  "catatan_teknis": "Lokasi memenuhi syarat zonasi. Tidak ada kendala teknis yang signifikan.",
+  "rekomendasi": "Application approved with note to pay attention to environmental aspects",
+  "catatan_teknis": "Location meets zoning requirements. No significant technical constraints.",
   "lampiran": [
     {
       "nama_file": "peta_lokasi_survey.pdf",
@@ -422,8 +422,8 @@ Content-Type: application/json
     "opd_id": 2,
     "reviewer_id": 2,
     "hasil_kajian": "disetujui",
-    "rekomendasi": "Permohonan disetujui dengan catatan untuk memperhatikan aspek lingkungan",
-    "catatan_teknis": "Lokasi memenuhi syarat zonasi. Tidak ada kendala teknis yang signifikan.",
+    "rekomendasi": "Application approved with note to pay attention to environmental aspects",
+    "catatan_teknis": "Location meets zoning requirements. No significant technical constraints.",
     "lampiran": [
       {
         "nama_file": "peta_lokasi_survey.pdf",
@@ -441,10 +441,10 @@ Content-Type: application/json
 }
 ```
 
-**Nilai `hasil_kajian` yang Valid**:
-- `"disetujui"` - Permohonan direkomendasikan untuk disetujui
-- `"ditolak"` - Permohonan tidak memenuhi syarat
-- `"perlu_revisi"` - Perlu perbaikan/kelengkapan dokumen
+**Valid `hasil_kajian` Values**:
+- `"disetujui"` - Application recommended for approval
+- `"ditolak"` - Application does not meet requirements
+- `"perlu_revisi"` - Needs document improvement/completion
 
 **Automated Tests** (Postman):
 ```javascript
@@ -462,10 +462,10 @@ pm.environment.set("kajian_id", pm.response.json().data.id);
 
 **Validation Points**:
 - ✅ Status code 201
-- ✅ `reviewer_id` terisi otomatis dari JWT token (user yang login)
-- ✅ `hasil_kajian` sesuai ENUM yang valid
-- ✅ `lampiran` tersimpan sebagai JSON array
-- ✅ `tanggal_kajian` terisi otomatis
+- ✅ `reviewer_id` auto-filled from JWT token (logged-in user)
+- ✅ `hasil_kajian` matches valid ENUM
+- ✅ `lampiran` saved as JSON array
+- ✅ `tanggal_kajian` auto-filled
 
 ---
 
@@ -474,8 +474,8 @@ pm.environment.set("kajian_id", pm.response.json().data.id);
 **Objective**: Admin creates permit draft and sends it to Leadership for review.
 
 **Prerequisites**:
-- ✅ Login sebagai **Admin**
-- ✅ Kajian teknis sudah selesai dengan hasil `"disetujui"`
+- ✅ Login as **Admin**
+- ✅ Technical review completed with `"disetujui"` result
 
 **Request**:
 ```http
@@ -529,10 +529,10 @@ pm.environment.set("draft_id", pm.response.json().data.id);
 
 **Validation Points**:
 - ✅ Status code 201
-- ✅ `status` otomatis menjadi `'dikirim_ke_pimpinan'`
-- ✅ `tanggal_kirim_pimpinan` terisi otomatis
-- ✅ `dibuat_oleh` terisi dengan ID Admin yang login
-- ✅ `nomor_draft` harus unique (tidak boleh duplikat)
+- ✅ `status` automatically becomes `'dikirim_ke_pimpinan'`
+- ✅ `tanggal_kirim_pimpinan` auto-filled
+- ✅ `dibuat_oleh` filled with logged-in Admin ID
+- ✅ `nomor_draft` must be unique (no duplicates allowed)
 
 ---
 
@@ -541,8 +541,8 @@ pm.environment.set("draft_id", pm.response.json().data.id);
 **Objective**: Leadership requests revision to the submitted permit draft.
 
 **Prerequisites**:
-- ✅ Logout dari Admin, login sebagai **Pimpinan**
-- ✅ Memiliki `draft_id` yang akan direvisi
+- ✅ Logout from Admin, login as **Pimpinan**
+- ✅ Have `draft_id` to be revised
 
 **Request**:
 ```http
@@ -552,7 +552,7 @@ Content-Type: application/json
 
 {
   "draft_id": 1,
-  "catatan_revisi": "Mohon untuk memperbaiki bagian pertimbangan hukum pada poin b. Tambahkan referensi ke Perda terbaru No. 5 Tahun 2024. Serta pastikan format penomoran sesuai dengan standar terbaru."
+  "catatan_revisi": "Please improve the legal consideration section in point b. Add reference to the latest Regional Regulation No. 5 of 2024. Also ensure the numbering format complies with the latest standard."
 }
 ```
 
@@ -565,7 +565,7 @@ Content-Type: application/json
       "id": 1,
       "draft_id": 1,
       "diminta_oleh": 3,
-      "catatan_revisi": "Mohon untuk memperbaiki bagian pertimbangan hukum...",
+      "catatan_revisi": "Please improve the legal consideration section in point b. Add reference to the latest Regional Regulation No. 5 of 2024. Also ensure the numbering format complies with the latest standard.",
       "status": "pending",
       "tanggal_revisi": "2024-01-15T15:00:00.000Z",
       "diselesaikan_oleh": null,
@@ -612,18 +612,18 @@ pm.environment.set("revisi_id", pm.response.json().data.revisi.id);
 
 **Validation Points**:
 - ✅ Status code 201
-- ✅ Draft status berubah menjadi `'perlu_revisi'`
-- ✅ Record baru dibuat di tabel `revisi_draft`
-- ✅ Revisi status default `'pending'`
-- ✅ `diminta_oleh` terisi dengan ID Pimpinan yang login
-- ✅ Response mengembalikan **both** revisi record AND updated draft
+- ✅ Draft status changed to `'perlu_revisi'`
+- ✅ New record created in `revisi_draft` table
+- ✅ Revision status defaults to `'pending'`
+- ✅ `diminta_oleh` filled with logged-in Pimpinan ID
+- ✅ Response returns **both** revision record AND updated draft
 
 **Business Logic**:
-1. Endpoint ini melakukan **2 operasi**:
-   - Update status draft → `'perlu_revisi'`
-   - Create new record di tabel `revisi_draft`
-2. Admin akan melihat permintaan revisi dan memperbaiki draft
-3. Setelah diperbaiki, Admin akan kirim ulang ke Pimpinan (loop ke Test 3)
+1. This endpoint performs **2 operations**:
+   - Update draft status → `'perlu_revisi'`
+   - Create new record in `revisi_draft` table
+2. Admin will see the revision request and improve the draft
+3. After improvement, Admin will send again to Pimpinan (loop to Test 3)
 
 ---
 
@@ -632,21 +632,21 @@ pm.environment.set("revisi_id", pm.response.json().data.revisi.id);
 **Objective**: Application Service triggers workflow after application registration.
 
 **Prerequisites**:
-- ✅ Workflow Service berjalan di port 3020
+- ✅ Workflow Service running on port 3020
 
 **Note**: 
-⚠️ Endpoint ini **BUKAN untuk testing manual** via Postman oleh user.  
-⚠️ Endpoint ini dipanggil **OTOMATIS** oleh Application Service.
+⚠️ This endpoint is **NOT for manual testing** via Postman by users.  
+⚠️ This endpoint is called **AUTOMATICALLY** by Application Service.
 
 **How It Works**:
 ```javascript
-// Di Application Service (layanan-pendaftaran)
-// routes/permohonanRoutes.js - endpoint registrasi
+// In Application Service (layanan-pendaftaran)
+// routes/permohonanRoutes.js - registration endpoint
 
 const axios = require('axios');
 
 router.post('/api/permohonan/:id/registrasi', async (req, res) => {
-  // ... generate nomor registrasi ...
+  // ... generate registration number ...
   
   // Trigger workflow service
   try {
@@ -662,7 +662,7 @@ router.post('/api/permohonan/:id/registrasi', async (req, res) => {
 });
 ```
 
-**Request** (jika ingin test manual):
+**Request** (if want to test manually):
 ```http
 POST http://localhost:3020/api/internal/receive-trigger
 Content-Type: application/json
@@ -688,9 +688,9 @@ Content-Type: application/json
 
 **Validation Points**:
 - ✅ Status code 201
-- ✅ **TIDAK memerlukan authentication** (no Bearer token)
-- ✅ Otomatis create record Disposisi dengan status `'Pending'`
-- ✅ Dipanggil oleh Application Service, bukan oleh user
+- ✅ **DOES NOT require authentication** (no Bearer token)
+- ✅ Automatically creates Disposition record with status `'Pending'`
+- ✅ Called by Application Service, not by user
 
 ---
 
@@ -709,24 +709,24 @@ Content-Type: application/json
 ### 7.2 Role Descriptions
 
 **Admin**:
-- Membuat disposisi ke OPD
-- Membuat draft izin
-- Mengirim draft ke Pimpinan
-- Memperbaiki draft berdasarkan revisi
+- Create disposition to OPD
+- Create permit draft
+- Send draft to Leadership
+- Improve draft based on revisions
 
-**OPD (Organisasi Perangkat Daerah)**:
-- Melakukan kajian teknis
-- Memberikan rekomendasi (disetujui/ditolak/perlu_revisi)
-- Upload lampiran hasil survey
+**OPD (Regional Organization)**:
+- Conduct technical review
+- Provide recommendations (approved/rejected/needs_revision)
+- Upload survey result attachments
 
 **Pimpinan**:
-- Review draft izin
-- Menyetujui atau meminta revisi draft
-- Memberikan catatan revisi
+- Review permit draft
+- Approve or request draft revision
+- Provide revision notes
 
 **Pemohon**:
-- Tidak memiliki akses ke Workflow Service
-- Hanya dapat melihat status melalui Application Service
+- No access to Workflow Service
+- Can only view status through Application Service
 
 ---
 
@@ -738,39 +738,39 @@ Content-Type: application/json
 **Cause**: JWT token expired (default 1 hour)  
 **Solution**:
 ```bash
-# Login ulang untuk mendapat token baru
+# Login again to get new token
 POST {{auth_base_url}}/api/auth/signin
 ```
 
 #### Error: "Access denied. Required role: Admin"
-**Cause**: Mencoba akses endpoint dengan role yang salah  
+**Cause**: Trying to access endpoint with wrong role  
 **Solution**:
-- Pastikan login dengan user yang memiliki role yang sesuai
-- Lihat Role Matrix di section 7.1
+- Ensure login with user that has appropriate role
+- See Role Matrix in section 7.1
 
 #### Error: "Duplicate entry for key 'nomor_draft'"
-**Cause**: `nomor_draft` harus unique  
+**Cause**: `nomor_draft` must be unique  
 **Solution**:
 ```json
 {
-  "nomor_draft": "DRAFT/2024/01/0002"  // Increment nomor
+  "nomor_draft": "DRAFT/2024/01/0002"  // Increment number
 }
 ```
 
 #### Error: "Draft tidak ditemukan"
-**Cause**: `draft_id` tidak ada di database  
+**Cause**: `draft_id` does not exist in database  
 **Solution**:
-- Pastikan sudah membuat draft dengan endpoint forward-to-pimpinan
-- Cek `draft_id` di environment variable
+- Ensure draft was created with forward-to-pimpinan endpoint
+- Check `draft_id` in environment variable
 
 #### Error: "Cannot read property 'id' of undefined"
-**Cause**: Token tidak terbaca atau middleware auth error  
+**Cause**: Token unreadable or auth middleware error  
 **Solution**:
 ```javascript
-// Pastikan header Authorization ada
+// Ensure Authorization header exists
 Authorization: Bearer {{accessToken}}
 
-// Pastikan environment variable accessToken terisi
+// Ensure environment variable accessToken is filled
 console.log(pm.environment.get("accessToken"));
 ```
 
@@ -821,7 +821,7 @@ WHERE d.permohonan_id = 1;
 
 **Enable Debug Logs**:
 ```javascript
-// server.js - tambahkan middleware logging
+// server.js - add logging middleware
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   console.log('Body:', req.body);
@@ -835,7 +835,7 @@ app.use((req, res, next) => {
 # Windows PowerShell
 netstat -ano | findstr :3020
 
-# Jika ada proses, kill dengan PID
+# If there's a process, kill with PID
 taskkill /PID <PID> /F
 ```
 
@@ -853,17 +853,17 @@ taskkill /PID <PID> /F
 - [ ] Postman collection imported
 - [ ] Postman environment imported & activated
 - [ ] Test users created (Admin, OPD, Pimpinan)
-- [ ] At least 1 permohonan ter-registrasi
+- [ ] At least 1 registered permohonan
 
 ### 9.2 Testing Flow Checklist
-- [ ] **Test 1**: Login sebagai Admin → Token tersimpan
-- [ ] **Test 2**: Create Disposisi OPD → `disposisi_id` tersimpan
-- [ ] **Test 3**: Login sebagai OPD → Token tersimpan
-- [ ] **Test 4**: Input Kajian Teknis → `kajian_id` tersimpan
-- [ ] **Test 5**: Login sebagai Admin → Token tersimpan
-- [ ] **Test 6**: Forward Draft to Pimpinan → `draft_id` tersimpan
-- [ ] **Test 7**: Login sebagai Pimpinan → Token tersimpan
-- [ ] **Test 8**: Request Revisi Draft → `revisi_id` tersimpan
+- [ ] **Test 1**: Login as Admin → Token saved
+- [ ] **Test 2**: Create Disposisi OPD → `disposisi_id` saved
+- [ ] **Test 3**: Login as OPD → Token saved
+- [ ] **Test 4**: Input Kajian Teknis → `kajian_id` saved
+- [ ] **Test 5**: Login as Admin → Token saved
+- [ ] **Test 6**: Forward Draft to Pimpinan → `draft_id` saved
+- [ ] **Test 7**: Login as Pimpinan → Token saved
+- [ ] **Test 8**: Request Revisi Draft → `revisi_id` saved
 - [ ] **Test 9**: Verify all data in database
 
 ### 9.3 Validation Checklist
@@ -882,42 +882,42 @@ taskkill /PID <PID> /F
 
 ### 10.1 End-to-End Flow
 
-**Full workflow dari Permohonan sampai Draft Izin**:
+**Full workflow from Permohonan to Permit Draft**:
 
 ```
 1. [Application Service] POST /api/permohonan
-   → Pemohon membuat permohonan
+   → Applicant creates application
 
 2. [Application Service] POST /api/permohonan/:id/dokumen
-   → Upload dokumen persyaratan
+   → Upload requirement documents
 
 3. [Application Service] POST /api/dokumen/:id/verifikasi
-   → Admin verifikasi dokumen
+   → Admin verifies documents
 
 4. [Application Service] POST /api/permohonan/:id/registrasi
-   → Admin registrasi → Generate nomor REG/YYYY/MM/XXXX
+   → Admin registers → Generate number REG/YYYY/MM/XXXX
    → TRIGGER WORKFLOW SERVICE (automatic)
 
 5. [Workflow Service] POST /api/workflow/disposisi-opd
-   → Admin disposisi ke OPD
+   → Admin creates disposition to OPD
 
 6. [Workflow Service] POST /api/workflow/kajian-teknis
-   → OPD input hasil kajian
+   → OPD inputs review results
 
 7. [Workflow Service] POST /api/workflow/forward-to-pimpinan
-   → Admin kirim draft ke Pimpinan
+   → Admin sends draft to Leadership
 
 8. [Workflow Service] POST /api/workflow/revisi-draft (optional)
-   → Pimpinan minta revisi
-   → Loop ke step 7 (perbaikan draft)
+   → Leadership requests revision
+   → Loop to step 7 (draft improvement)
 
 9. [Application Service] GET /api/permohonan/:id/status
-   → Pemohon cek status permohonan
+   → Applicant checks application status
 ```
 
 ### 10.2 Testing Script (Run All)
 
-Buat Postman Collection Runner untuk menjalankan semua test secara berurutan:
+Create Postman Collection Runner to run all tests sequentially:
 
 1. Login Admin
 2. Create Disposisi
@@ -948,7 +948,7 @@ Buat Postman Collection Runner untuk menjalankan semua test secara berurutan:
 ✅ Always use HTTPS in production  
 ✅ JWT tokens expire in 1 hour  
 ✅ Role-based access enforced via middleware  
-✅ Internal endpoints (`/api/internal/*`) tidak boleh exposed ke public  
+✅ Internal endpoints (`/api/internal/*`) must not be exposed to public  
 ✅ Validate ENUM values before DB insert  
 
 ### 11.3 Data Validation
@@ -970,7 +970,7 @@ Buat Postman Collection Runner untuk menjalankan semua test secara berurutan:
   "permohonan_id": 1,
   "nomor_registrasi": "REG/2024/01/0001",
   "opd_id": 2,
-  "catatan_disposisi": "Mohon segera dilakukan kajian teknis untuk permohonan ini. Prioritas tinggi."
+  "catatan_disposisi": "Please conduct technical review for this application immediately. High priority."
 }
 ```
 
@@ -980,8 +980,8 @@ Buat Postman Collection Runner untuk menjalankan semua test secara berurutan:
   "permohonan_id": 1,
   "opd_id": 2,
   "hasil_kajian": "disetujui",
-  "rekomendasi": "Permohonan dapat disetujui dengan ketentuan sebagai berikut:\n1. Memperhatikan aspek lingkungan\n2. Mengikuti ketentuan GSB (Garis Sempadan Bangunan)\n3. Melengkapi IMB dalam 30 hari",
-  "catatan_teknis": "Berdasarkan survey lapangan:\n- Lokasi sesuai RTRW\n- Tidak ada kendala teknis\n- Akses jalan memadai",
+  "rekomendasi": "Application can be approved with the following conditions:\n1. Pay attention to environmental aspects\n2. Follow GSB (Building Boundary Line) regulations\n3. Complete IMB within 30 days",
+  "catatan_teknis": "Based on field survey:\n- Location complies with RTRW\n- No technical constraints\n- Adequate road access",
   "lampiran": [
     {"nama_file": "survey_report.pdf", "url": "/uploads/survey_report.pdf"},
     {"nama_file": "foto_lokasi.jpg", "url": "/uploads/foto_lokasi.jpg"}
@@ -995,7 +995,7 @@ Buat Postman Collection Runner untuk menjalankan semua test secara berurutan:
   "permohonan_id": 1,
   "nomor_registrasi": "REG/2024/01/0001",
   "nomor_draft": "DRAFT/IMB/2024/01/0001",
-  "isi_draft": "KEPUTUSAN KEPALA DAERAH NOMOR: DRAFT/IMB/2024/01/0001\n\nTENTANG PERSETUJUAN IZIN MENDIRIKAN BANGUNAN\n\n[... full content ...]"
+  "isi_draft": "REGIONAL HEAD DECISION NUMBER: DRAFT/IMB/2024/01/0001\n\nREGARDING BUILDING PERMIT APPROVAL\n\n[... full content ...]"
 }
 ```
 
@@ -1043,13 +1043,13 @@ Buat Postman Collection Runner untuk menjalankan semua test secara berurutan:
 
 ## 📝 Conclusion
 
-Selamat! Anda telah menyelesaikan setup dan testing untuk **Workflow Service**.
+Congratulations! You have completed the setup and testing for **Workflow Service**.
 
 **What's Next**:
-- ✅ Integrate dengan frontend (if any)
+- ✅ Integrate with frontend (if any)
 - ✅ Add notification service (email/SMS) for disposisi
-- ✅ Implement dashboard untuk monitoring workflow
-- ✅ Add approval flow untuk Pimpinan (approve/reject draft)
+- ✅ Implement dashboard for workflow monitoring
+- ✅ Add approval flow for Pimpinan (approve/reject draft)
 - ✅ Export draft as PDF for official documents
 
 **Support**:
