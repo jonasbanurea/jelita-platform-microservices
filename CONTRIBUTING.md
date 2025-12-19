@@ -161,4 +161,4 @@ For questions or discussions:
 
 ---
 
-**Thank you for contributing to Jelita Microservices!** 🚀
+**Thank you for contributing to Jelita Microservices!** 

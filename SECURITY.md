@@ -18,7 +18,7 @@ Please do not create public GitHub issues for security vulnerabilities.
 
 ### 2. Report Privately
 
-Send details to: [your-email@example.com]
+Send details to: banurea.jonas@gmail.com
 
 Include:
 - Description of the vulnerability
