@@ -48,6 +48,54 @@ build/
 # PM2
 .pm2/
 
+# ========================================
+# INTERNAL WORKING DOCUMENTS
+# (Sprint tracking, not research evidence)
+# ========================================
+
+# Day-by-day progress tracking
+DAY*_*.md
+TESTING_DAY*.md
+
+# Internal justifications and analysis
+SOAK_TEST_JUSTIFICATION.md
+REVIEWER_COMMENTS_ANALYSIS.md
+REVIEWER_REQUESTS_STATUS.md
+PUBLISHER_REVISION_ANALYSIS.md
+
+# Writing guides and templates
+DAY3_PAPER_WRITING_GUIDE.md
+SECTION_*.md
+
+# Sprint management
+START_DAY*.md
+QUICK_STATUS.md
+QUICK_ACTION*.md
+EXECUTIVE_SUMMARY*.md
+MASTER_PROGRESS*.md
+WEEK_SPRINT*.md
+WHAT_TO_DO_NEXT.md
+
+# Indonesian summaries (internal)
+RINGKASAN_*.md
+laporan-*.md
+
+# Duplicate/redundant testing reports
+TESTING_EXECUTION_GUIDE.md
+TESTING_INFRASTRUCTURE_SUMMARY.md
+TESTING_QUICK_REFERENCE.md
+TESTING_REPORT_SUMMARY.md
+TESTING_RESULTS.md
+VISUAL_TESTING_SUMMARY.md
+report-baseline-stress-user-count-jelita.md
+
+# Test result files (large, generated)
+tests/results/*.json
+tests/results/*.html
+
+# Submission guide (internal)
+GITHUB_SUBMISSION_GUIDE.md
+
 # Optional npm cache
 .npm
 

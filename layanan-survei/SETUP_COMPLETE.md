@@ -1,22 +1,22 @@
 # ✅ SURVEY (SKM) SERVICE - SETUP COMPLETED!
 
-## 🎉 Status Lengkap
+## 🎉 Complete Status
 
-### ✅ Yang Sudah Selesai
+### ✅ What Has Been Completed
 
 1. **Database Setup**
-   - ✅ Database `jelita_survei` telah dibuat
-   - ✅ Table `skm` telah dibuat dengan 12 fields
+   - ✅ Database `jelita_survei` has been created
+   - ✅ Table `skm` has been created with 12 fields
    - ✅ Sequelize models synchronized
 
 2. **Server Setup**
-   - ✅ Dependencies terinstall (express, sequelize, mysql2, jwt, axios, bcryptjs)
-   - ✅ Server berjalan di **Port 3030**
-   - ✅ JWT_SECRET synchronized dengan Auth Service
-   - ✅ 6 endpoint SKM siap digunakan
+   - ✅ Dependencies installed (express, sequelize, mysql2, jwt, axios, bcryptjs)
+   - ✅ Server running on **Port 3030**
+   - ✅ JWT_SECRET synchronized with Auth Service
+   - ✅ 6 SKM endpoints ready to use
 
 3. **Models Created**
-   - ✅ SKM.js (enhanced dengan 10 fields + timestamps)
+   - ✅ SKM.js (enhanced with 10 fields + timestamps)
 
 4. **Routes Implemented**
    - ✅ POST /api/skm/notifikasi (Admin, OPD)
@@ -33,17 +33,17 @@
    - ✅ Pemohon (username: `pemohon_demo`, password: `demo123`) **← ID: 4**
 
 6. **Documentation**
-   - ✅ TESTING_GUIDE.md (50+ halaman)
+   - ✅ TESTING_GUIDE.md (50+ pages)
    - ✅ README.md
    - ✅ QUICK_START.md
-   - ✅ Postman Collection dengan automated tests
-   - ✅ Postman Environment dengan variables
+   - ✅ Postman Collection with automated tests
+   - ✅ Postman Environment with variables
 
 ---
 
-## 🚀 CARA MULAI TESTING
+## 🚀 HOW TO START TESTING
 
-### Step 1: Pastikan Semua Services Running
+### Step 1: Ensure All Services Are Running
 
 ```powershell
 # Check running services
@@ -57,18 +57,18 @@ TCP    0.0.0.0:3010    # Application Service
 TCP    0.0.0.0:3030    # Survey Service
 ```
 
-**Jika belum running**, start services:
+**If not running yet**, start services:
 ```powershell
 # Terminal 1 - Auth Service
-cd d:\KULIAH\TESIS\prototype\layanan-manajemen-pengguna
+cd d:\KULIAH\TESIS\prototype_eng\layanan-manajemen-pengguna
 npm start
 
 # Terminal 2 - Application Service
-cd d:\KULIAH\TESIS\prototype\layanan-pendaftaran
+cd d:\KULIAH\TESIS\prototype_eng\layanan-pendaftaran
 npm start
 
 # Terminal 3 - Survey Service
-cd d:\KULIAH\TESIS\prototype\layanan-survei
+cd d:\KULIAH\TESIS\prototype_eng\layanan-survei
 npm start
 ```
 
@@ -76,21 +76,21 @@ npm start
 
 ### Step 2: Get Test Data (permohonan_id)
 
-**Cara 1: Via MySQL**
+**Method 1: Via MySQL**
 ```sql
--- Get permohonan yang sudah disetujui
+-- Get approved application
 SELECT id, nomor_registrasi, status, user_id 
 FROM jelita_pendaftaran.permohonan 
 WHERE status = 'Disetujui' 
 LIMIT 1;
 ```
 
-**Cara 2: Via Postman (Application Service)**
-- Login sebagai Pemohon
-- Create new permohonan
-- Simpan `permohonan_id` yang dikembalikan
+**Method 2: Via Postman (Application Service)**
+- Login as Applicant (Pemohon)
+- Create new application
+- Save returned `permohonan_id`
 
-**Jika belum ada permohonan**, buat data test:
+**If no application exists yet**, create test data:
 ```sql
 USE jelita_pendaftaran;
 
@@ -112,48 +112,48 @@ SELECT id, nomor_registrasi, status, user_id FROM permohonan;
 
 ---
 
-### Step 3: Import ke Postman
+### Step 3: Import to Postman
 
-1. Buka Postman
-2. Klik **Import**
-3. Import file:
+1. Open Postman
+2. Click **Import**
+3. Import files:
    - `layanan-survei/postman/Survey_Service.postman_collection.json`
    - `layanan-survei/postman/Survey_Service.postman_environment.json`
-4. Pilih environment **"Survey Service Environment"**
+4. Select environment **"Survey Service Environment"**
 
 ---
 
 ### Step 4: Set Environment Variables
 
-Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
+In Postman, click the eye icon (👁️) at top right, then edit environment:
 
-| Variable | Value | Keterangan |
-|----------|-------|------------|
-| `survey_base_url` | `http://localhost:3030` | ✅ Sudah terisi |
-| `auth_base_url` | `http://localhost:3001` | ✅ Sudah terisi |
-| `application_base_url` | `http://localhost:3010` | ✅ Sudah terisi |
-| `permohonan_id` | **ISI MANUAL** | ID permohonan yang sudah disetujui |
-| `pemohon_user_id` | **4** | ID user Pemohon (dari step 1) |
+| Variable | Value | Description |
+|----------|-------|------------||
+| `survey_base_url` | `http://localhost:3030` | ✅ Already filled |
+| `auth_base_url` | `http://localhost:3001` | ✅ Already filled |
+| `application_base_url` | `http://localhost:3010` | ✅ Already filled |
+| `permohonan_id` | **FILL MANUALLY** | Approved application ID |
+| `pemohon_user_id` | **4** | Applicant user ID (from step 1) |
 
 ---
 
 ### Step 5: Testing Flow (8 Steps)
 
-#### 1️⃣ Login sebagai Admin
+#### 1️⃣ Login as Admin
 **Collection**: Survey Service  
 **Folder**: "0. Setup - Login"  
 **Request**: "Login as Admin"  
 
 **Expected**:
 - Status 200
-- `accessToken` auto-saved ke environment
+- `accessToken` auto-saved to environment
 
 ---
 
-#### 2️⃣ Send Notifikasi SKM
+#### 2️⃣ Send SKM Notification
 **Collection**: Survey Service  
-**Folder**: "1. Notifikasi SKM"  
-**Request**: "POST Send Notifikasi SKM"
+**Folder**: "1. SKM Notification"  
+**Request**: "POST Send SKM Notification"
 
 **Body** (auto-filled from environment):
 ```json
@@ -166,8 +166,8 @@ Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
 
 **Expected**:
 - Status 200
-- Response memiliki `survey_link`
-- `skm_id` auto-saved ke environment
+- Response has `survey_link`
+- `skm_id` auto-saved to environment
 
 **Automated Tests**:
 - ✅ Status code is 200
@@ -183,9 +183,9 @@ Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
 
 **Expected**:
 - Status 200
-- Form memiliki **9 pertanyaan** standar SKM
-- Setiap pertanyaan memiliki skala 1-4
-- **TIDAK memerlukan Authorization header**
+- Form has **9 questions** SKM standard
+- Each question has 1-4 scale
+- **DOES NOT require Authorization header**
 
 **Automated Tests**:
 - ✅ Status code is 200
@@ -194,7 +194,7 @@ Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
 
 ---
 
-#### 4️⃣ Login sebagai Pemohon
+#### 4️⃣ Login as Applicant (Pemohon)
 **Collection**: Survey Service  
 **Folder**: "0. Setup - Login"  
 **Request**: "Login as Pemohon"
@@ -209,7 +209,7 @@ Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
 
 **Expected**:
 - Status 200
-- `accessToken` updated dengan token Pemohon
+- `accessToken` updated with Pemohon token
 
 ---
 
@@ -234,16 +234,16 @@ Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
       {"id": 8, "nilai": 3, "unsur": "Sarana dan Prasarana"},
       {"id": 9, "nilai": 3, "unsur": "Penanganan Pengaduan"}
     ],
-    "saran": "Pelayanan sudah sangat baik, perlu peningkatan di sarana prasarana"
+    "saran": "Service is very good, needs improvement in facilities and infrastructure"
   }
 }
 ```
 
 **Expected**:
 - Status 201
-- SKM status berubah menjadi `completed`
-- SKM value ter-calculate: **91.67**
-- Category: **"Sangat Baik"**
+- SKM status changed to `completed`
+- SKM value calculated: **91.67**
+- Category: **"Excellent"**
 
 **Automated Tests**:
 - ✅ Status code is 201
@@ -252,24 +252,24 @@ Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
 
 ---
 
-#### 6️⃣ Login sebagai Admin (lagi)
+#### 6️⃣ Login as Admin (again)
 **Collection**: Survey Service  
 **Folder**: "0. Setup - Login"  
 **Request**: "Login as Admin"
 
 ---
 
-#### 7️⃣ Get Rekap SKM
+#### 7️⃣ Get SKM Recap
 **Collection**: Survey Service  
-**Folder**: "4. Rekap SKM"  
+**Folder**: "4. SKM Recap"  
 **Request**: "GET Rekap SKM (Admin)"
 
 **Expected**:
 - Status 200
-- Statistik: `total_surveys`, `completed`, `pending`
-- `average_skm_value` ter-calculate
-- `category_distribution` tersedia
-- List surveys dengan individual SKM values
+- Statistics: `total_surveys`, `completed`, `pending`
+- `average_skm_value` calculated
+- `category_distribution` available
+- Survey list with individual SKM values
 
 **Automated Tests**:
 - ✅ Status code is 200
@@ -278,9 +278,9 @@ Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
 
 ---
 
-#### 8️⃣ Buka Akses Download (Internal)
+#### 8️⃣ Unlock Download Access (Internal)
 **Collection**: Survey Service  
-**Folder**: "5. Buka Akses Download"  
+**Folder**: "5. Unlock Download Access"  
 **Request**: "POST Unlock Download (Internal)"
 
 **Body**:
@@ -293,8 +293,8 @@ Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
 **Expected**:
 - Status 200
 - `download_unlocked` = true
-- `download_unlocked_at` timestamp terisi
-- **TIDAK memerlukan Authorization** (internal endpoint)
+- `download_unlocked_at` timestamp filled
+- **DOES NOT require Authorization** (internal endpoint)
 
 **Automated Tests**:
 - ✅ Status code is 200
@@ -302,9 +302,9 @@ Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
 
 ---
 
-#### 9️⃣ Trigger Pengarsipan (Internal) - OPTIONAL
+#### 9️⃣ Trigger Archiving (Internal) - OPTIONAL
 **Collection**: Survey Service  
-**Folder**: "6. Trigger Pengarsipan"  
+**Folder**: "6. Trigger Archiving"  
 **Request**: "POST Trigger Archive (Internal)"
 
 **Body**:
@@ -319,24 +319,24 @@ Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
 **⚠️ EXPECTED ERROR (Normal)**:
 ```json
 {
-  "error": "Gagal trigger Archive Service",
+  "error": "Failed to trigger Archive Service",
   "details": "Error"
 }
 ```
 
 **Why?**
-- Archive Service **belum diimplementasikan** (akan dibuat nanti)
-- Port 3040 tidak ada yang listening
-- Error ini **NORMAL dan EXPECTED** untuk saat testing
+- Archive Service **has not been implemented yet** (will be created later)
+- Port 3040 has no listener
+- This error is **NORMAL and EXPECTED** for now during testing
 
 **Note**: 
-- ✅ **SKIP test ini untuk sekarang** - Archive Service akan dibuat sebagai service terakhir
-- ✅ Endpoint sudah siap dan akan berfungsi otomatis setelah Archive Service dibuat
-- ✅ Test 1-8 sudah cukup untuk validasi Survey Service
+- ✅ **SKIP this test for now** - Archive Service will be created as the last service
+- ✅ Endpoint is ready and will function automatically after Archive Service is created
+- ✅ Tests 1-8 are sufficient for Survey Service validation
 
 ---
 
-## 📊 Validasi Database
+## 📊 Database Validation
 
 ```sql
 -- Check all SKM records
@@ -385,68 +385,68 @@ ORDER BY role;
 **Manual Calculation**:
 
 Example from test data:
-- Jawaban: [4, 4, 3, 4, 4, 4, 4, 3, 3]
+- Answers: [4, 4, 3, 4, 4, 4, 4, 3, 3]
 - Total: 33
 - Average: 33 / 9 = 3.67
 - **SKM Value**: (3.67 / 4) × 100 = **91.67**
-- **Category**: Sangat Baik (≥ 88.31)
+- **Category**: Excellent (≥ 88.31)
 
 **Categories** (Permenpan RB No. 14/2017):
-| Nilai SKM | Kategori |
-|-----------|----------|
-| 88.31 - 100.00 | Sangat Baik |
-| 76.61 - 88.30 | Baik |
-| 65.00 - 76.60 | Kurang Baik |
-| 25.00 - 64.99 | Tidak Baik |
+| SKM Value | Category |
+|-----------|---------|
+| 88.31 - 100.00 | Excellent |
+| 76.61 - 88.30 | Good |
+| 65.00 - 76.60 | Fair |
+| 25.00 - 64.99 | Poor |
 
 ---
 
 ## 🔧 Troubleshooting
 
-### ❌ "Token tidak valid atau sudah kadaluarsa"
-**Penyebab**: JWT_SECRET berbeda antara services  
-**Solusi**: ✅ Sudah diperbaiki! JWT_SECRET di Survey Service sudah synchronized dengan Auth Service
+### ❌ "Token is invalid or has expired"
+**Cause**: JWT_SECRET different between services  
+**Solution**: ✅ Already fixed! JWT_SECRET in Survey Service is synchronized with Auth Service
 
 ---
 
-### ❌ "SKM tidak ditemukan"
-**Penyebab**: Belum ada SKM record untuk permohonan_id  
-**Solusi**: 
-1. Kirim notifikasi dulu dengan endpoint `/api/skm/notifikasi`
-2. Atau submit SKM akan auto-create record baru
+### ❌ "SKM not found"
+**Cause**: No SKM record exists for permohonan_id  
+**Solution**: 
+1. Send notification first using endpoint `/api/skm/notifikasi`
+2. Or submit SKM will auto-create new record
 
 ---
 
-### ❌ "SKM belum diselesaikan"
-**Penyebab**: Trying to unlock download sebelum SKM completed  
-**Solusi**:
-1. Submit SKM terlebih dahulu (endpoint `/api/skm/submit`)
+### ❌ "SKM has not been completed"
+**Cause**: Trying to unlock download before SKM completed  
+**Solution**:
+1. Submit SKM first (endpoint `/api/skm/submit`)
 2. Check SKM status: `SELECT status FROM skm WHERE permohonan_id = 1;`
 
 ---
 
 ### ❌ "Failed to trigger Archive Service"
-**Penyebab**: Archive Service tidak running atau belum dibuat  
-**Solusi**: 
-- ✅ **SKIP test ini untuk sekarang** - Ini NORMAL!
-- Archive Service **belum diimplementasikan** (port 3040 kosong)
-- Endpoint `/api/internal/trigger-pengarsipan` akan berfungsi otomatis setelah Archive Service dibuat
-- **Test endpoint 1-8 sudah cukup** untuk validasi Survey Service
+**Cause**: Archive Service not running or not yet created  
+**Solution**: 
+- ✅ **SKIP this test for now** - This is NORMAL!
+- Archive Service **has not been implemented yet** (port 3040 empty)
+- Endpoint `/api/internal/trigger-pengarsipan` will function automatically after Archive Service is created
+- **Tests 1-8 are sufficient** for Survey Service validation
 
 **Expected Error**:
 ```json
 {
-  "error": "Gagal trigger Archive Service",
+  "error": "Failed to trigger Archive Service",
   "details": "Error"
 }
 ```
 
-**Status**: ✅ Endpoint sudah siap, menunggu Archive Service diimplementasikan
+**Status**: ✅ Endpoint is ready, waiting for Archive Service to be implemented
 
 ---
 
 ### ❌ Port 3030 already in use
-**Solusi**:
+**Solution**:
 ```powershell
 # Find process using port 3030
 netstat -ano | findstr :3030
@@ -455,7 +455,7 @@ netstat -ano | findstr :3030
 taskkill /F /PID <PID>
 
 # Restart Survey Service
-cd d:\KULIAH\TESIS\prototype\layanan-survei
+cd d:\KULIAH\TESIS\prototype_eng\layanan-survei
 node server.js
 ```
 
@@ -492,17 +492,17 @@ layanan-survei/
 
 ---
 
-## 📚 Dokumentasi
+## 📚 Documentation
 
-- **Quick Start**: `postman/QUICK_START.md` - Panduan singkat testing
-- **Full Testing Guide**: `postman/TESTING_GUIDE.md` - Dokumentasi lengkap 50+ halaman
-- **README**: `README.md` - Dokumentasi API dan project overview
+- **Quick Start**: `postman/QUICK_START.md` - Quick testing guide
+- **Full Testing Guide**: `postman/TESTING_GUIDE.md` - Complete documentation 50+ pages
+- **README**: `README.md` - API documentation and project overview
 - **Postman Collection**: `postman/Survey_Service.postman_collection.json`
 - **Postman Environment**: `postman/Survey_Service.postman_environment.json`
 
 ---
 
-## 🎯 Checklist Final
+## 🎯 Final Checklist
 
 ### Pre-Testing
 - [x] MySQL Server running
@@ -516,18 +516,18 @@ layanan-survei/
 - [x] Postman collection imported
 - [x] Postman environment imported & activated
 - [ ] Environment variables set (`permohonan_id`, `pemohon_user_id`)
-- [ ] Test permohonan data available
+- [ ] Test application data available
 
 ### Testing Flow
 - [ ] **Test 1**: Login Admin → Token saved
-- [ ] **Test 2**: Send Notifikasi SKM → skm_id saved
-- [ ] **Test 3**: Get Form SKM → 9 questions shown
-- [ ] **Test 4**: Login Pemohon → Token updated
+- [ ] **Test 2**: Send SKM Notification → skm_id saved
+- [ ] **Test 3**: Get SKM Form → 9 questions shown
+- [ ] **Test 4**: Login Applicant → Token updated
 - [ ] **Test 5**: Submit SKM → SKM value calculated
 - [ ] **Test 6**: Login Admin (again) → Token refreshed
-- [ ] **Test 7**: Get Rekap SKM → Statistics shown
+- [ ] **Test 7**: Get SKM Recap → Statistics shown
 - [ ] **Test 8**: Unlock Download → download_unlocked = true
-- [ ] **Test 9**: Trigger Archive → ⚠️ SKIP (Archive Service belum ada - NORMAL!)
+- [ ] **Test 9**: Trigger Archive → ⚠️ SKIP (Archive Service not yet available - NORMAL!)
 
 ### Validation
 - [ ] All responses have correct status codes
@@ -543,40 +543,40 @@ layanan-survei/
 
 ## 🎓 SKM Standards Reference
 
-### 9 Unsur Pelayanan (Permenpan RB No. 14/2017)
+### 9 Service Elements (Permenpan RB No. 14/2017)
 
-1. **Persyaratan** - Kesesuaian persyaratan dengan jenis pelayanan
-2. **Prosedur** - Kemudahan prosedur pelayanan
-3. **Waktu Pelayanan** - Kecepatan waktu pelayanan
-4. **Biaya/Tarif** - Kewajaran biaya/tarif pelayanan
-5. **Produk Spesifikasi** - Kesesuaian produk pelayanan
-6. **Kompetensi Pelaksana** - Kemampuan petugas pelayanan
-7. **Perilaku Pelaksana** - Sikap dan perilaku petugas
-8. **Sarana dan Prasarana** - Kualitas sarana dan prasarana
-9. **Penanganan Pengaduan** - Efektivitas penanganan keluhan
+1. **Requirements** - Suitability of requirements with service type
+2. **Procedure** - Ease of service procedure
+3. **Service Time** - Speed of service time
+4. **Cost/Fee** - Fairness of service cost/fee
+5. **Product Specification** - Suitability of service product
+6. **Executor Competence** - Service staff capability
+7. **Executor Behavior** - Staff attitude and behavior
+8. **Facilities and Infrastructure** - Quality of facilities and infrastructure
+9. **Complaint Handling** - Effectiveness of complaint handling
 
-### Skala Penilaian
-- **1** = Tidak Baik
-- **2** = Kurang Baik
-- **3** = Baik
-- **4** = Sangat Baik
+### Rating Scale
+- **1** = Poor
+- **2** = Fair
+- **3** = Good
+- **4** = Excellent
 
 ---
 
-## 🎉 SELESAI!
+## 🎉 DONE!
 
-Survey (SKM) Service **SIAP DIGUNAKAN**!
+Survey (SKM) Service is **READY TO USE**!
 
 **Next Steps**:
-1. ✅ Pastikan semua services running (auth, application, survey)
+1. ✅ Ensure all services are running (auth, application, survey)
 2. ✅ Import Postman collection & environment
 3. ✅ Set environment variables (`permohonan_id`, `pemohon_user_id`)
-4. ✅ Testing 9 steps di atas
-5. ✅ Verifikasi di database
-6. ✅ Review TESTING_GUIDE.md untuk detail lengkap
+4. ✅ Test 9 steps above
+5. ✅ Verify in database
+6. ✅ Review TESTING_GUIDE.md for complete details
 
 **What's Next After This?**
-- 🔜 **Archive Service** - Layanan pengarsipan dokumen (port 3040)
+- 🔜 **Archive Service** - Document archiving service (port 3040)
 - 🔜 Integration testing across all services
 - 🔜 Production deployment preparation
 

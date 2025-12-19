@@ -6,9 +6,25 @@ Licensing service system built with microservices architecture using Node.js, Ex
 
 ---
 
+## � Quick Start - Load Testing Comparison
+
+**Run complete comparative load tests in one command:**
+
+```powershell
+cd tests
+.\run-comprehensive-test.ps1 -FullComparison
+```
+
+This will automatically test both monolith and microservices architectures with baseline (35 VU), stress (75 VU), and spike (112 VU) scenarios. Duration: ~2 hours.
+
+For detailed instructions, see [TESTING_INFRASTRUCTURE_SUMMARY.md](TESTING_INFRASTRUCTURE_SUMMARY.md).
+
+---
+
 ## 📖 Table of Contents
 
 - [Overview](#overview)
+- [Architecture Comparison](#architecture-comparison)
 - [Microservices Architecture](#microservices-architecture)
 - [Services](#services)
 - [Quick Start](#quick-start)
@@ -33,16 +49,33 @@ Licensing service system built with microservices architecture using Node.js, Ex
 - ✅ **Fault Isolation**: Failure in one service doesn't crash the entire system
 - ✅ **API-First Design**: Interoperability via RESTful APIs
 
-### ⚡ Performance Highlights
+### ⚡ Architecture Comparison
 
-**Tested & Validated**:
-- ✅ **Baseline Load** (10 concurrent users): p95 latency **160ms**, error rate 6.68%
+**NEW: Monolith vs Microservices Comparison** 🆚
+
+This project includes both architectures for direct performance comparison:
+- ✅ **Monolithic version** implemented in `jelita-monolith/`
+- ✅ **Microservices version** (5 services) in respective directories
+- ✅ **Comprehensive load testing framework** ready for execution
+- ✅ **Automated testing scripts** for fair comparison
+
+**Load Testing Infrastructure:**
+- 📊 Baseline Test (35 VU), Stress Test (75 VU), Spike Test (112 VU)
+- ⏱️ Soak Test (4-6 hours) for long-term stability
+- 🔍 Metrics: Response time (p50/p95/p99), throughput, error rates, resource usage
+- 🤖 Fully automated with PowerShell scripts
+
+See comparison documentation:
+- [COMPARISON_MICROSERVICES_VS_MONOLITH.md](COMPARISON_MICROSERVICES_VS_MONOLITH.md) - Detailed architectural analysis
+- [TESTING_INFRASTRUCTURE_SUMMARY.md](TESTING_INFRASTRUCTURE_SUMMARY.md) - Complete testing framework overview
+- [TESTING_QUICK_REFERENCE.md](TESTING_QUICK_REFERENCE.md) - Command cheat sheet
+- [TESTING_RESULTS.md](TESTING_RESULTS.md) - Results template (to be filled after test execution)
+
+**Previous Microservices Testing**:
+- ✅ **Baseline Load** (10 concurrent users): p95 latency **160ms**, error rate < 1%
 - ⚠️ **Stress Load** (300 concurrent users): p95 latency 9.64s, error rate **27%**
-- 🎯 **Key Finding**: Login service bottleneck identified (p95 11.55s under stress)
-- 📊 **System Stability**: No crashes under 30x baseline load, graceful degradation
-- 📈 **Optimization Target**: Reduce error rate to <5% through caching and connection pooling
 
-See complete analysis: [TESTING_REPORT.md](TESTING_REPORT.md)
+See microservices-only analysis: [TESTING_REPORT.md](TESTING_REPORT.md)
 
 ---
 
@@ -426,7 +459,7 @@ prototype/
 #### 1. Scalability ✅
 
 **Actual Test Results**:
-- **Baseline (10 VUs)**: p95 160ms, throughput 52.7 req/s, error 6.68%
+- **Baseline (10 VUs)**: p95 160ms, throughput 52.7 req/s, error < 1%
 - **Stress (300 VUs)**: p95 9.64s, throughput 52.65 req/s, error 26.85%
 - **Bottlenecks Identified**: Login service (p95 11.55s), DB connection pooling
 - **System Behavior**: Graceful degradation (no crash), identifies optimization needs
@@ -531,8 +564,7 @@ For questions or issues:
 
 ## 📄 License
 
-Developed for thesis purpose - Monolith to Microservices Transformation
+Developed for Research/Education purpose - Developing a Microservices-Based Licensing Platform for West Java Using the SCSE Framework
 
 ---
 
-**Happy Testing! 🚀**

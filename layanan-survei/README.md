@@ -2,7 +2,7 @@
 
 Microservice untuk mengelola **Survei Kepuasan Masyarakat (SKM)** pada sistem perizinan Jelita.
 
-## 📋 Daftar Isi
+## 📋 Table of Contents
 - [Overview](#overview)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -17,12 +17,12 @@ Microservice untuk mengelola **Survei Kepuasan Masyarakat (SKM)** pada sistem pe
 
 ## 🎯 Overview
 
-Survey Service mengelola proses Survei Kepuasan Masyarakat (SKM) yang **wajib diisi** oleh pemohon setelah permohonan izin disetujui. Service ini mengimplementasikan standar SKM berdasarkan **Permenpan RB No. 14 Tahun 2017** dengan 9 unsur pelayanan publik.
+Survey Service manages the Public Satisfaction Survey (SKM) process which is **mandatory** for applicants after permit application is approved. This service implements SKM standards based on **Permenpan RB No. 14 of 2017** with 9 public service elements.
 
 ### Business Flow
 ```
-Izin Disetujui → Notifikasi SKM → Pemohon Isi SKM → 
-Unlock Download → Download Izin → Trigger Arsip
+Permit Approved → SKM Notification → Applicant Fills SKM → 
+Unlock Download → Download Permit → Trigger Archive
 ```
 
 ### Port & Database
@@ -34,32 +34,32 @@ Unlock Download → Download Izin → Trigger Arsip
 
 ## ✨ Features
 
-### 1. Notifikasi SKM
-- Admin/OPD mengirim notifikasi survei kepada pemohon
-- Generate link survei unik
-- Track status notifikasi (notified_at)
+### 1. SKM Notification
+- Admin/OPD sends survey notification to applicant
+- Generate unique survey link
+- Track notification status (notified_at)
 
-### 2. Form SKM
-- Public endpoint (tanpa autentikasi)
-- 9 pertanyaan standar berdasarkan Permenpan RB
-- Skala penilaian 1-4 untuk setiap unsur
+### 2. SKM Form
+- Public endpoint (no authentication)
+- 9 standard questions based on Permenpan RB
+- 1-4 rating scale for each element
 
 ### 3. Submit SKM
-- Pemohon submit jawaban survei
-- Auto-calculate nilai SKM (0-100)
-- Kategorisasi: Sangat Baik, Baik, Kurang Baik, Tidak Baik
+- Applicant submits survey answers
+- Auto-calculate SKM value (0-100)
+- Categorization: Excellent, Good, Fair, Poor
 
-### 4. Rekap SKM
-- Admin/OPD/Pimpinan lihat statistik
-- Filter by status, tanggal
-- Average SKM value & distribusi kategori
+### 4. SKM Recap
+- Admin/OPD/Leadership views statistics
+- Filter by status, date
+- Average SKM value & category distribution
 
 ### 5. Unlock Download
-- Auto-unlock download access setelah SKM selesai
+- Auto-unlock download access after SKM completed
 - Notify Application Service
 
-### 6. Trigger Pengarsipan
-- Trigger Archive Service setelah download
+### 6. Trigger Archiving
+- Trigger Archive Service after download
 - Service-to-service communication
 
 ---
@@ -176,7 +176,7 @@ http://localhost:3030
 **Response** (200):
 ```json
 {
-  "message": "Notifikasi SKM berhasil dikirim",
+  "message": "SKM notification sent successfully",
   "data": {
     "permohonan_id": 1,
     "nomor_registrasi": "REG/2024/01/0001",
@@ -197,22 +197,22 @@ http://localhost:3030
 **Response** (200):
 ```json
 {
-  "message": "Form SKM berhasil diambil",
+  "message": "SKM form retrieved successfully",
   "data": {
-    "title": "Survei Kepuasan Masyarakat (SKM)",
+    "title": "Public Satisfaction Survey (SKM)",
     "questions": [
       {
         "id": 1,
-        "pertanyaan": "Bagaimana pendapat Saudara tentang kesesuaian persyaratan pelayanan...",
-        "unsur": "Persyaratan",
+        "pertanyaan": "What do you think about the suitability of service requirements...",
+        "unsur": "Requirements",
         "skala": [
-          { "nilai": 1, "label": "Tidak Sesuai" },
-          { "nilai": 2, "label": "Kurang Sesuai" },
-          { "nilai": 3, "label": "Sesuai" },
-          { "nilai": 4, "label": "Sangat Sesuai" }
+          { "nilai": 1, "label": "Not Suitable" },
+          { "nilai": 2, "label": "Less Suitable" },
+          { "nilai": 3, "label": "Suitable" },
+          { "nilai": 4, "label": "Very Suitable" }
         ]
       }
-      // ... 8 pertanyaan lainnya
+      // ... 8 other questions
     ]
   }
 }
@@ -241,7 +241,7 @@ http://localhost:3030
       {"id": 8, "nilai": 3, "unsur": "Sarana dan Prasarana"},
       {"id": 9, "nilai": 3, "unsur": "Penanganan Pengaduan"}
     ],
-    "saran": "Pelayanan sudah sangat baik"
+    "saran": "Service is very good"
   }
 }
 ```
@@ -249,7 +249,7 @@ http://localhost:3030
 **Response** (201):
 ```json
 {
-  "message": "Survei SKM berhasil disubmit",
+  "message": "SKM survey successfully submitted",
   "data": {
     "skm_id": 1,
     "permohonan_id": 1,
@@ -259,7 +259,7 @@ http://localhost:3030
       "total": 33,
       "average": "3.67",
       "skm_value": "91.67",
-      "category": "Sangat Baik"
+      "category": "Excellent"
     }
   }
 }
@@ -282,17 +282,17 @@ http://localhost:3030
 **Response** (200):
 ```json
 {
-  "message": "Rekap SKM berhasil diambil",
+  "message": "SKM recap retrieved successfully",
   "data": {
     "total_surveys": 5,
     "completed": 4,
     "pending": 1,
     "average_skm_value": "87.50",
     "category_distribution": {
-      "Sangat Baik": 2,
-      "Baik": 2,
-      "Kurang Baik": 0,
-      "Tidak Baik": 0
+      "Excellent": 2,
+      "Good": 2,
+      "Fair": 0,
+      "Poor": 0
     },
     "surveys": [
       {
@@ -325,7 +325,7 @@ http://localhost:3030
 **Response** (200):
 ```json
 {
-  "message": "Akses download berhasil dibuka",
+  "message": "Download access successfully unlocked",
   "data": {
     "permohonan_id": 1,
     "download_unlocked": true,
@@ -353,11 +353,11 @@ http://localhost:3030
 **Response** (200):
 ```json
 {
-  "message": "Pengarsipan berhasil ditrigger",
+  "message": "Archiving successfully triggered",
   "data": {
     "permohonan_id": 1,
     "archive_response": {
-      "message": "Dokumen berhasil diarsipkan",
+      "message": "Document successfully archived",
       "arsip_id": 1
     }
   }
@@ -368,48 +368,48 @@ http://localhost:3030
 
 ## 📊 SKM Standards
 
-### Permenpan RB No. 14 Tahun 2017
+### Permenpan RB No. 14 of 2017
 
-SKM mengukur **9 Unsur Pelayanan Publik**:
+SKM measures **9 Public Service Elements**:
 
-1. **Persyaratan** - Kesesuaian persyaratan dengan jenis pelayanan
-2. **Prosedur** - Kemudahan prosedur pelayanan
-3. **Waktu Pelayanan** - Kecepatan waktu pelayanan
-4. **Biaya/Tarif** - Kewajaran biaya/tarif pelayanan
-5. **Produk Spesifikasi** - Kesesuaian produk pelayanan
-6. **Kompetensi Pelaksana** - Kemampuan petugas pelayanan
-7. **Perilaku Pelaksana** - Sikap dan perilaku petugas
-8. **Sarana dan Prasarana** - Kualitas sarana dan prasarana
-9. **Penanganan Pengaduan** - Efektivitas penanganan keluhan
+1. **Requirements** - Suitability of requirements with service type
+2. **Procedure** - Ease of service procedure
+3. **Service Time** - Speed of service time
+4. **Cost/Fee** - Fairness of service cost/fee
+5. **Product Specification** - Suitability of service product
+6. **Executor Competence** - Service staff capability
+7. **Executor Behavior** - Staff attitude and behavior
+8. **Facilities and Infrastructure** - Quality of facilities and infrastructure
+9. **Complaint Handling** - Effectiveness of complaint handling
 
-### Skala Penilaian
-Setiap unsur dinilai dengan skala **1-4**:
-- **1** = Tidak Baik
-- **2** = Kurang Baik
-- **3** = Baik
-- **4** = Sangat Baik
+### Rating Scale
+Each element is rated with scale **1-4**:
+- **1** = Poor
+- **2** = Fair
+- **3** = Good
+- **4** = Excellent
 
-### Perhitungan SKM Value
+### SKM Value Calculation
 
 **Formula**:
 ```
 SKM Value = (Average Score / 4) × 100
 ```
 
-**Contoh**:
-- Jawaban: [4, 4, 3, 4, 4, 4, 4, 3, 3]
+**Example**:
+- Answers: [4, 4, 3, 4, 4, 4, 4, 3, 3]
 - Total: 33
 - Average: 33/9 = 3.67
 - **SKM Value**: (3.67/4) × 100 = **91.67**
 
-### Kategori Mutu Pelayanan
+### Service Quality Category
 
-| Nilai SKM | Kategori | Mutu | Kinerja |
-|-----------|----------|------|---------|
-| 88.31 - 100.00 | **Sangat Baik** | A | Sangat Baik |
-| 76.61 - 88.30 | **Baik** | B | Baik |
-| 65.00 - 76.60 | **Kurang Baik** | C | Kurang Baik |
-| 25.00 - 64.99 | **Tidak Baik** | D | Tidak Baik |
+| SKM Value | Category | Quality | Performance |
+|-----------|----------|------|---------||
+| 88.31 - 100.00 | **Excellent** | A | Excellent |
+| 76.61 - 88.30 | **Good** | B | Good |
+| 65.00 - 76.60 | **Fair** | C | Fair |
+| 25.00 - 64.99 | **Poor** | D | Poor |
 
 ---
 
@@ -439,17 +439,17 @@ CREATE TABLE skm (
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | INT | Primary key |
-| `permohonan_id` | INT | ID permohonan dari Application Service |
-| `user_id` | INT | ID user pemohon |
-| `nomor_registrasi` | VARCHAR(255) | Nomor registrasi permohonan |
-| `jawaban_json` | JSON | Jawaban survei dengan 9 unsur |
-| `status` | ENUM | Status SKM: 'pending' atau 'completed' |
-| `submitted_at` | DATETIME | Timestamp submit SKM |
-| `notified_at` | DATETIME | Timestamp kirim notifikasi |
-| `download_unlocked` | BOOLEAN | Flag unlock download izin |
-| `download_unlocked_at` | DATETIME | Timestamp unlock download |
-| `created_at` | DATETIME | Timestamp created |
-| `updated_at` | DATETIME | Timestamp updated |
+| `permohonan_id` | INT | Application ID from Application Service |
+| `user_id` | INT | Applicant user ID |
+| `nomor_registrasi` | VARCHAR(255) | Application registration number |
+| `jawaban_json` | JSON | Survey answers with 9 elements |
+| `status` | ENUM | SKM status: 'pending' or 'completed' |
+| `submitted_at` | DATETIME | SKM submission timestamp |
+| `notified_at` | DATETIME | Notification sent timestamp |
+| `download_unlocked` | BOOLEAN | Permit download unlock flag |
+| `download_unlocked_at` | DATETIME | Download unlock timestamp |
+| `created_at` | DATETIME | Created timestamp |
+| `updated_at` | DATETIME | Updated timestamp |
 
 ### Sample Data
 
@@ -513,7 +513,7 @@ postman/Survey_Service.postman_environment.json
    ```
 
 ### Automated Tests
-Setiap request memiliki automated tests:
+Each request has automated tests:
 - ✅ Status code validation
 - ✅ Response structure validation
 - ✅ Auto-save environment variables
@@ -651,11 +651,11 @@ layanan-survei/
 
 | Status | Error | Solution |
 |--------|-------|----------|
-| 400 | SKM belum diselesaikan | Submit SKM terlebih dahulu |
-| 401 | No token provided | Login untuk mendapatkan token |
-| 403 | Access denied | Login dengan role yang sesuai |
-| 404 | SKM tidak ditemukan | Kirim notifikasi SKM terlebih dahulu |
-| 500 | Archive Service error | Pastikan Archive Service running |
+| 400 | SKM has not been completed | Submit SKM first |
+| 401 | No token provided | Login to get token |
+| 403 | Access denied | Login with appropriate role |
+| 404 | SKM not found | Send SKM notification first |
+| 500 | Archive Service error | Ensure Archive Service is running |
 
 ### Error Response Format
 ```json

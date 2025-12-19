@@ -1,6 +1,6 @@
 # 🚀 Quick Start Guide - Survey (SKM) Service
 
-Panduan cepat untuk testing Survey Service dengan Postman.
+Quick guide for testing Survey Service with Postman.
 
 ---
 
@@ -9,19 +9,19 @@ Panduan cepat untuk testing Survey Service dengan Postman.
 ### 1. Start Services
 ```powershell
 # Terminal 1 - Auth Service
-cd d:\KULIAH\TESIS\prototype\layanan-manajemen-pengguna
+cd d:\KULIAH\TESIS\prototype_eng\layanan-manajemen-pengguna
 npm start
 
 # Terminal 2 - Application Service  
-cd d:\KULIAH\TESIS\prototype\layanan-pendaftaran
+cd d:\KULIAH\TESIS\prototype_eng\layanan-pendaftaran
 npm start
 
 # Terminal 3 - Survey Service
-cd d:\KULIAH\TESIS\prototype\layanan-survei
+cd d:\KULIAH\TESIS\prototype_eng\layanan-survei
 npm start
 ```
 
-### 2. Import ke Postman
+### 2. Import to Postman
 1. Open Postman
 2. Import `postman/Survey_Service.postman_collection.json`
 3. Import `postman/Survey_Service.postman_environment.json`
@@ -164,13 +164,13 @@ netstat -ano | findstr :3030  # Survey Service
 ## 🛠️ Troubleshooting
 
 ### ❌ "Token not provided"
-**Fix**: Login dulu untuk mendapatkan `accessToken`
+**Fix**: Login first to get `accessToken`
 
 ### ❌ "SKM tidak ditemukan"
-**Fix**: Kirim notifikasi SKM dulu dengan endpoint `/api/skm/notifikasi`
+**Fix**: Send SKM notification first using endpoint `/api/skm/notifikasi`
 
-### ❌ "SKM belum diselesaikan"
-**Fix**: Submit SKM dulu sebelum unlock download
+### ❌ "SKM has not been completed"
+**Fix**: Submit SKM first before unlock download
 
 ### ❌ "Failed to trigger Archive Service"
 **Fix**: 
@@ -181,7 +181,7 @@ netstat -ano | findstr :3040
 ```
 
 ### ❌ "Access denied. Required role: Pemohon"
-**Fix**: Login dengan user role Pemohon untuk submit SKM
+**Fix**: Login with user role Pemohon to submit SKM
 
 ---
 
@@ -282,15 +282,15 @@ INSERT INTO jelita_survei.skm (
 
 ### Setup Database
 ```powershell
-cd d:\KULIAH\TESIS\prototype\layanan-survei; node scripts/createDatabase.js; node scripts/setupDatabase.js
+cd d:\KULIAH\TESIS\prototype_eng\layanan-survei; node scripts/createDatabase.js; node scripts/setupDatabase.js
 ```
 
 ### Start All Services
 ```powershell
 # Use 3 separate terminals
-start powershell -NoExit -Command "cd d:\KULIAH\TESIS\prototype\layanan-manajemen-pengguna; npm start"
-start powershell -NoExit -Command "cd d:\KULIAH\TESIS\prototype\layanan-pendaftaran; npm start"
-start powershell -NoExit -Command "cd d:\KULIAH\TESIS\prototype\layanan-survei; npm start"
+start powershell -NoExit -Command "cd d:\KULIAH\TESIS\prototype_eng\layanan-manajemen-pengguna; npm start"
+start powershell -NoExit -Command "cd d:\KULIAH\TESIS\prototype_eng\layanan-pendaftaran; npm start"
+start powershell -NoExit -Command "cd d:\KULIAH\TESIS\prototype_eng\layanan-survei; npm start"
 ```
 
 ### Check All Services
@@ -320,7 +320,5 @@ After successful testing, you should see:
 - ✅ Download unlock status = true after completion
 
 ---
-
-**Happy Testing! 🎉**
 
 For detailed explanations, see `TESTING_GUIDE.md`

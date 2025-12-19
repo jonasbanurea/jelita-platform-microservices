@@ -1,71 +1,71 @@
-# Layanan Pendaftaran - Quick Start Guide
+# Application Service - Quick Start Guide
 
 ## ✅ Setup Complete!
 
-Layanan Pendaftaran (Application Service) sudah siap digunakan dengan 9 endpoint lengkap.
+Application Service is ready to use with 9 complete endpoints.
 
 ---
 
-## 🚀 Cara Menjalankan
+## 🚀 How to Run
 
-### 1. Install Dependencies (Sekali saja)
+### 1. Install Dependencies (One time only)
 ```powershell
-cd d:\KULIAH\TESIS\prototype\layanan-pendaftaran
+cd d:\KULIAH\TESIS\prototype_eng\layanan-pendaftaran
 npm install
 ```
 
-### 2. Setup Database (Sekali saja)
+### 2. Setup Database (One time only)
 ```powershell
 node scripts/createDatabase.js
 node scripts/setupDatabase.js
 ```
 
-### 3. Jalankan Server
+### 3. Start Server
 ```powershell
 node server.js
 ```
 
-Server akan berjalan di: **http://localhost:3010**
+Server will run on: **http://localhost:3010**
 
 ---
 
 ## 📦 Postman Testing
 
 ### Import Collection
-1. Buka Postman
-2. Import files dari folder `postman/`:
+1. Open Postman
+2. Import files from `postman/` folder:
    - `Application_Service.postman_collection.json`
    - `Application_Service.postman_environment.json`
-3. Pilih environment: **Application Service - Development**
+3. Select environment: **Application Service - Development**
 
-### Mendapatkan Token
-**PENTING:** Sebelum testing, dapatkan token dari User Service:
+### Getting Token
+**IMPORTANT:** Before testing, get token from User Service:
 
 ```powershell
-# Jalankan User Service di terminal terpisah
-cd d:\KULIAH\TESIS\prototype\layanan-manajemen-pengguna
+# Run User Service in separate terminal
+cd d:\KULIAH\TESIS\prototype_eng\layanan-manajemen-pengguna
 $env:PORT=3001; node server.js
 ```
 
-Lalu di Postman:
-1. Import collection User Auth Service
-2. Jalankan **Sign In** (username: `demo`, password: `demo123`)
-3. Token otomatis tersimpan di `AUTH_HEADER`
+Then in Postman:
+1. Import User Auth Service collection
+2. Run **Sign In** (username: `demo`, password: `demo123`)
+3. Token automatically saved to `AUTH_HEADER`
 
 ---
 
-## 🧪 Testing Flow (Happy Path)
+## 🧪 Testing Flow 
 
-### Urutan Testing Recommended:
+### Recommended Testing Sequence:
 
 ```
-1. Login di User Service ✓
+1. Login to User Service ✓
    ↓
 2. POST /api/permohonan (Create)
    ↓
 3. POST /api/permohonan/:id/dokumen (Upload KTP)
    ↓
-4. POST /api/permohonan/:id/dokumen (Upload Surat Kuasa)
+4. POST /api/permohonan/:id/dokumen (Upload Power of Attorney)
    ↓
 5. POST /api/dokumen/:id/verifikasi (Verify - Admin/OPD)
    ↓
@@ -82,16 +82,16 @@ Lalu di Postman:
 
 ## 📋 Endpoint Summary
 
-| # | Endpoint | Method | Auth | Role | Deskripsi |
-|---|----------|--------|------|------|-----------|
-| 1 | `/api/permohonan` | POST | ✓ | Any | Create permohonan baru |
-| 2 | `/api/permohonan/:id` | PUT | ✓ | Owner/Admin/OPD | Update data permohonan |
-| 3 | `/api/permohonan/:id/dokumen` | POST | ✓ | Owner | Upload dokumen (max 5MB) |
-| 4 | `/api/dokumen/:id/verifikasi` | POST | ✓ | Admin/OPD | Verifikasi dokumen |
-| 5 | `/api/permohonan/:id/notifikasi-perbaikan` | POST | ✓ | Admin/OPD | Kirim notifikasi perbaikan |
-| 6 | `/api/permohonan/:id/registrasi` | POST | ✓ | Admin/OPD | Finalisasi & buat nomor registrasi |
-| 7 | `/api/permohonan/:id/tanda-terima` | GET | ✓ | Owner/Admin/OPD | Generate PDF tanda terima |
-| 8 | `/api/permohonan/:id/status` | GET | ✓ | Owner/Admin/OPD/Pimpinan | Cek status permohonan |
+| # | Endpoint | Method | Auth | Role | Description |
+|---|----------|--------|------|------|-------------|
+| 1 | `/api/permohonan` | POST | ✓ | Any | Create new application |
+| 2 | `/api/permohonan/:id` | PUT | ✓ | Owner/Admin/OPD | Update application data |
+| 3 | `/api/permohonan/:id/dokumen` | POST | ✓ | Owner | Upload document (max 5MB) |
+| 4 | `/api/dokumen/:id/verifikasi` | POST | ✓ | Admin/OPD | Verify document |
+| 5 | `/api/permohonan/:id/notifikasi-perbaikan` | POST | ✓ | Admin/OPD | Send correction notification |
+| 6 | `/api/permohonan/:id/registrasi` | POST | ✓ | Admin/OPD | Finalize & create registration number |
+| 7 | `/api/permohonan/:id/tanda-terima` | GET | ✓ | Owner/Admin/OPD | Generate PDF receipt |
+| 8 | `/api/permohonan/:id/status` | GET | ✓ | Owner/Admin/OPD/Pimpinan | Check application status |
 | 9 | `/api/internal/trigger-workflow` | POST | ✗ | Internal | Trigger workflow service |
 
 ---
@@ -115,10 +115,10 @@ layanan-pendaftaran/
 ├── scripts/
 │   ├── createDatabase.js       # Create DB
 │   └── setupDatabase.js        # Create tables
-├── postman/
-│   ├── Application_Service.postman_collection.json
-│   ├── Application_Service.postman_environment.json
-│   └── TESTING_GUIDE.md        # Panduan lengkap testing
+└── postman/
+    ├── Application_Service.postman_collection.json
+    ├── Application_Service.postman_environment.json
+    └── TESTING_GUIDE.md        # Complete testing guide
 └── uploads/                     # File upload folder (auto-created)
 ```
 
@@ -126,7 +126,7 @@ layanan-pendaftaran/
 
 ## 🔑 Environment Variables
 
-File `.env` sudah dikonfigurasi dengan:
+`.env` file is already configured with:
 
 ```properties
 PORT=3010
@@ -144,7 +144,7 @@ MAX_FILE_SIZE=5242880
 
 ## 🎯 Example Request
 
-### Create Permohonan
+### Create Application
 ```json
 POST http://localhost:3010/api/permohonan
 Authorization: Bearer YOUR_TOKEN
@@ -161,7 +161,7 @@ Authorization: Bearer YOUR_TOKEN
 }
 ```
 
-### Upload Dokumen
+### Upload Document
 ```
 POST http://localhost:3010/api/permohonan/1/dokumen
 Authorization: Bearer YOUR_TOKEN
@@ -176,51 +176,51 @@ jenis_dokumen: KTP
 ## 🐛 Common Issues
 
 ### 1. "401 Unauthorized - No token provided"
-- Pastikan sudah login ke User Service
-- Copy token ke environment variable `AUTH_HEADER`
+- Ensure you've logged in to User Service
+- Copy token to environment variable `AUTH_HEADER`
 
 ### 2. "403 Forbidden - Access denied"
-- Endpoint memerlukan role Admin/OPD
-- Login dengan user Admin atau OPD
+- Endpoint requires Admin/OPD role
+- Login with Admin or OPD user
 
 ### 3. "File upload error"
 - Max file size: 5MB
 - Allowed types: jpeg, jpg, png, pdf, doc, docx
-- Gunakan body type `form-data` bukan `raw`
+- Use body type `form-data` not `raw`
 
 ### 4. "Cannot generate PDF - No nomor_registrasi"
-- Permohonan harus sudah finalize terlebih dahulu
-- Jalankan endpoint "Finalize & Register" dulu
+- Application must be finalized first
+- Run "Finalize & Register" endpoint first
 
 ---
 
-## 📖 Dokumentasi Lengkap
+## 📖 Complete Documentation
 
-Lihat file `postman/TESTING_GUIDE.md` untuk:
-- Penjelasan detail setiap endpoint
+See `postman/TESTING_GUIDE.md` file for:
+- Detailed explanation of each endpoint
 - Expected request & response
-- Skenario testing lengkap
+- Complete testing scenarios
 - Troubleshooting guide
 - API reference
 
 ---
 
-## 🔄 Status Permohonan
+## 🔄 Application Status
 
-| Status | Deskripsi |
-|--------|-----------|
-| `draft` | Baru dibuat, belum lengkap |
-| `perlu_perbaikan` | Butuh revisi dari pemohon |
-| `menunggu_verifikasi` | Dokumen dalam proses verifikasi |
-| `terdaftar` | Sudah finalize dan dapat nomor registrasi |
-| `diproses` | Dalam proses workflow teknis |
-| `selesai` | Proses selesai |
+| Status | Description |
+|--------|-----------||
+| `draft` | Newly created, not complete |
+| `perlu_perbaikan` | Needs revision from applicant |
+| `menunggu_verifikasi` | Document under verification process |
+| `terdaftar` | Already finalized and got registration number |
+| `diproses` | In technical workflow process |
+| `selesai` | Process completed |
 
 ---
 
 ## 🎉 Ready to Test!
 
-Server sedang berjalan di **http://localhost:3010**
+Server is running on **http://localhost:3010**
 
-Gunakan Postman untuk testing semua endpoint. Happy testing! 🚀
+Use Postman to test all endpoints. 
 

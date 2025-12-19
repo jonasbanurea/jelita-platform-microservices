@@ -1,0 +1,86 @@
+# Artillery Load Test Configuration - Stress (75 VU)
+# Target: Jelita Microservices (Auth + Health Only)  
+# Duration: 2 minutes
+# Purpose: Stress test based on peak traffic (791 req/min)
+
+config:
+  target: 'http://localhost:3001'
+  phases:
+    - duration: 120
+      arrivalRate: 75
+      name: 'Stress Load - 75 VU'
+  plugins:
+    expect: {}
+
+scenarios:
+  # 70% - User Authentication
+  - name: 'User Authentication'
+    weight: 70
+    flow:
+      # Sign in
+      - post:
+          url: '/api/auth/signin'
+          json:
+            username: 'pemohon{{ $randomNumber(1, 50) }}'
+            password: 'password123'
+          capture:
+            - json: '$.data.accessToken'
+              as: 'token'
+          expect:
+            - statusCode: 200
+      
+      - think: 2
+      
+      # Verify token by checking health
+      - get:
+          url: 'http://localhost:3001/health'
+          expect:
+            - statusCode: 200
+
+  # 20% - Admin Authentication
+  - name: 'Admin Authentication'
+    weight: 20
+    flow:
+      - post:
+          url: '/api/auth/signin'
+          json:
+            username: 'admin{{ $randomNumber(1, 10) }}'
+            password: 'password123'
+          capture:
+            - json: '$.data.accessToken'
+              as: 'token'
+          expect:
+            - statusCode: 200
+      
+      - think: 2
+      
+      - get:
+          url: 'http://localhost:3001/health'
+          expect:
+            - statusCode: 200
+
+  # 10% - Service Health Check
+  - name: 'Service Health Check'
+    weight: 10
+    flow:
+      # Check all services health
+      - get:
+          url: 'http://localhost:3001/health'
+          expect:
+            - statusCode: 200
+      - get:
+          url: 'http://localhost:3010/health'
+          expect:
+            - statusCode: 200
+      - get:
+          url: 'http://localhost:3020/health'
+          expect:
+            - statusCode: 200
+      - get:
+          url: 'http://localhost:3030/health'
+          expect:
+            - statusCode: 200
+      - get:
+          url: 'http://localhost:3040/health'
+          expect:
+            - statusCode: 200

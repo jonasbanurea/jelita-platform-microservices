@@ -1,0 +1,4 @@
+﻿email,password,role
+pemohon1@test.com,password123,Pemohon
+pemohon2@test.com,password123,Pemohon
+admin1@test.com,password123,Admin

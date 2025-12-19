@@ -1,41 +1,41 @@
-# Panduan Pengujian User & Auth Service dengan Postman
+# Testing Guide for User & Auth Service with Postman
 
-## Daftar Isi
-1. [Persiapan](#persiapan)
+## Table of Contents
+1. [Preparation](#preparation)
 2. [Import Collection & Environment](#import-collection--environment)
-3. [Konfigurasi Environment](#konfigurasi-environment)
-4. [Menjalankan Pengujian](#menjalankan-pengujian)
+3. [Environment Configuration](#environment-configuration)
+4. [Running Tests](#running-tests)
 5. [Troubleshooting](#troubleshooting)
 
 ---
 
-## Persiapan
+## Preparation
 
 ### 1. Install Postman
-- Download dan install Postman dari [postman.com/downloads](https://www.postman.com/downloads/)
-- Atau gunakan Postman Web (login di [postman.com](https://www.postman.com))
+- Download and install Postman from [postman.com/downloads](https://www.postman.com/downloads/)
+- Or use Postman Web (login at [postman.com](https://www.postman.com))
 
-### 2. Pastikan Service Berjalan
-Sebelum melakukan pengujian, pastikan layanan-manajemen-pengguna sudah berjalan:
+### 2. Ensure Service is Running
+Before testing, ensure layanan-manajemen-pengguna is running:
 
 ```powershell
-cd d:\KULIAH\TESIS\prototype\layanan-manajemen-pengguna
+cd d:\KULIAH\TESIS\prototype_eng\layanan-manajemen-pengguna
 npm install
 node server.js
 ```
 
-Atau jika menggunakan nodemon:
+Or if using nodemon:
 ```powershell
 npm run dev
 ```
 
-Pastikan muncul pesan:
+Ensure the following message appears:
 ```
 User & Auth Service is running on port 3005
 ```
 
-### 3. Persiapkan Database
-Pastikan database sudah dikonfigurasi dan memiliki minimal 1 user untuk testing. File `.env` harus sudah terisi:
+### 3. Prepare Database
+Ensure the database is configured and has at least 1 user for testing. The `.env` file must be filled:
 
 ```
 PORT=3005
@@ -50,78 +50,78 @@ JWT_SECRET=your_generated_jwt_secret_here
 
 ## Import Collection & Environment
 
-### Cara 1: Import via File
+### Method 1: Import via File
 
-1. **Buka Postman**
+1. **Open Postman**
 2. **Import Collection:**
-   - Klik tombol **Import** di kiri atas
-   - Pilih tab **File**
-   - Browse ke: `d:\KULIAH\TESIS\prototype\layanan-manajemen-pengguna\postman\User_Auth_Service.postman_collection.json`
-   - Klik **Import**
+   - Click **Import** button at top left
+   - Select **File** tab
+   - Browse to: `d:\KULIAH\TESIS\prototype_eng\layanan-manajemen-pengguna\postman\User_Auth_Service.postman_collection.json`
+   - Click **Import**
    
 3. **Import Environment:**
-   - Klik tombol **Import** lagi
-   - Browse ke: `d:\KULIAH\TESIS\prototype\layanan-manajemen-pengguna\postman\User_Auth_Service.postman_environment.json`
-   - Klik **Import**
+   - Click **Import** button again
+   - Browse to: `d:\KULIAH\TESIS\prototype_eng\layanan-manajemen-pengguna\postman\User_Auth_Service.postman_environment.json`
+   - Click **Import**
 
-### Cara 2: Drag & Drop
+### Method 2: Drag & Drop
 
-Cukup drag and drop kedua file JSON ke jendela Postman.
+Simply drag and drop both JSON files into the Postman window.
 
 ---
 
-## Konfigurasi Environment
+## Environment Configuration
 
-### Aktifkan Environment
+### Activate Environment
 
-1. Klik dropdown **Environment** di kanan atas (biasanya tertulis "No Environment")
-2. Pilih **User Auth Service - Development**
+1. Click **Environment** dropdown at top right (usually shows "No Environment")
+2. Select **User Auth Service - Development**
 
-### Sesuaikan Variable (jika perlu)
+### Adjust Variables (if needed)
 
-Klik icon mata (👁️) di sebelah dropdown environment untuk melihat/edit variable:
+Click the eye icon (👁️) next to environment dropdown to view/edit variables:
 
-| Variable | Value Default | Keterangan |
+| Variable | Default Value | Description |
 |----------|---------------|------------|
-| `BASE_URL` | `http://localhost:3005` | URL service (sesuaikan PORT jika berbeda) |
-| `TOKEN` | (kosong) | Akan terisi otomatis setelah signin |
-| `AUTH_HEADER` | (kosong) | Akan terisi otomatis setelah signin |
-| `USER_ID` | `1` | ID user untuk testing endpoint peran |
+| `BASE_URL` | `http://localhost:3005` | Service URL (adjust PORT if different) |
+| `TOKEN` | (empty) | Will be auto-filled after signin |
+| `AUTH_HEADER` | (empty) | Will be auto-filled after signin |
+| `USER_ID` | `1` | User ID for testing role endpoint |
 
-Jika service Anda berjalan di port berbeda, edit `BASE_URL` sesuai kebutuhan.
+If your service runs on a different port, edit `BASE_URL` as needed.
 
 ---
 
-## Menjalankan Pengujian
+## Running Tests
 
-### Workflow Testing yang Disarankan
+### Recommended Testing Workflow
 
 ```
-1. Sign In (dapatkan token)
+1. Sign In (get token)
    ↓
-2. Validate Token (cek token valid)
+2. Validate Token (check token is valid)
    ↓
-3. Get User Role & Permissions (akses protected endpoint)
+3. Get User Role & Permissions (access protected endpoint)
 ```
 
 ---
 
 ### 1. **POST /api/auth/signin** - Sign In
 
-**Tujuan:** Login dan mendapatkan JWT token
+**Purpose:** Login and get JWT token
 
-#### Langkah-langkah:
-1. Buka collection **User & Auth Service - Layanan Manajemen Pengguna**
-2. Buka folder **Authentication**
-3. Klik request **Sign In**
-4. Di tab **Body**, sesuaikan username dan password dengan user yang ada di database:
+#### Steps:
+1. Open collection **User & Auth Service - Layanan Manajemen Pengguna**
+2. Open folder **Authentication**
+3. Click request **Sign In**
+4. In **Body** tab, adjust username and password with existing user in database:
    ```json
    {
        "username": "demo",
        "password": "demo123"
    }
    ```
-5. Klik **Send**
+5. Click **Send**
 
 #### Expected Response (200 OK):
 ```json
@@ -130,28 +130,28 @@ Jika service Anda berjalan di port berbeda, edit `BASE_URL` sesuai kebutuhan.
 }
 ```
 
-#### Apa yang Terjadi Otomatis:
-- Token disimpan ke environment variable `TOKEN`
-- Variable `AUTH_HEADER` terisi dengan format `Bearer <token>`
-- Anda bisa lihat di tab **Tests** → **Console** (Ctrl+Alt+C)
+#### What Happens Automatically:
+- Token saved to environment variable `TOKEN`
+- Variable `AUTH_HEADER` filled with format `Bearer <token>`
+- You can see in **Tests** tab → **Console** (Ctrl+Alt+C)
 
-#### Jika Gagal:
-- **404 User not found** → Username tidak ada di database
-- **401 Invalid credentials** → Password salah
-- **500 Internal server error** → Cek koneksi database atau log server
+#### If Failed:
+- **404 User not found** → Username doesn't exist in database
+- **401 Invalid credentials** → Wrong password
+- **500 Internal server error** → Check database connection or server logs
 
 ---
 
 ### 2. **GET /api/auth/validate** - Validate Token
 
-**Tujuan:** Memvalidasi token JWT yang didapat dari signin
+**Purpose:** Validate JWT token obtained from signin
 
-#### Langkah-langkah:
-1. Klik request **Validate Token**
-2. Pastikan di tab **Headers** sudah ada:
+#### Steps:
+1. Click request **Validate Token**
+2. Ensure in **Headers** tab there is:
    - Key: `Authorization`
-   - Value: `{{AUTH_HEADER}}` (otomatis mengambil dari environment)
-3. Klik **Send**
+   - Value: `{{AUTH_HEADER}}` (automatically fetched from environment)
+3. Click **Send**
 
 #### Expected Response (200 OK):
 ```json
@@ -165,33 +165,33 @@ Jika service Anda berjalan di port berbeda, edit `BASE_URL` sesuai kebutuhan.
 ```
 
 #### Automated Tests:
-Collection sudah include automated tests yang akan:
-- ✅ Memastikan status code 200
-- ✅ Memastikan token valid
-- ✅ Memastikan user memiliki id dan role
+Collection already includes automated tests that will:
+- ✅ Ensure status code 200
+- ✅ Ensure token is valid
+- ✅ Ensure user has id and role
 
-Lihat hasil test di tab **Test Results** setelah send request.
+View test results in **Test Results** tab after sending request.
 
-#### Jika Gagal:
-- **401 No token provided** → Token tidak terkirim (pastikan sudah signin dulu)
-- **401 Invalid or expired token** → Token expired (signin ulang) atau JWT_SECRET berbeda
+#### If Failed:
+- **401 No token provided** → Token not sent (ensure signin first)
+- **401 Invalid or expired token** → Token expired (signin again) or JWT_SECRET different
 
 ---
 
 ### 3. **GET /api/users/:id/peran** - Get User Role & Permissions
 
-**Tujuan:** Mendapatkan role dan hak akses user (protected endpoint)
+**Purpose:** Get user role and permissions (protected endpoint)
 
-#### Langkah-langkah:
-1. Buka folder **Users**
-2. Klik request **Get User Role & Permissions**
-3. Di tab **Params**, sesuaikan path variable `:id`:
+#### Steps:
+1. Open folder **Users**
+2. Click request **Get User Role & Permissions**
+3. In **Params** tab, adjust path variable `:id`:
    - Key: `id`
-   - Value: `1` (atau ID user lain yang ingin dicek)
-4. Pastikan di tab **Headers** sudah ada:
+   - Value: `1` (or other user ID to check)
+4. Ensure in **Headers** tab there is:
    - Key: `Authorization`
    - Value: `{{AUTH_HEADER}}`
-5. Klik **Send**
+5. Click **Send**
 
 #### Expected Response (200 OK):
 ```json
@@ -207,7 +207,7 @@ Lihat hasil test di tab **Test Results** setelah send request.
 }
 ```
 
-#### Access Rights berdasarkan Role:
+#### Access Rights by Role:
 
 | Role | Access Permissions |
 |------|-------------------|
@@ -218,24 +218,24 @@ Lihat hasil test di tab **Test Results** setelah send request.
 
 #### Automated Tests:
 - ✅ Status code 200
-- ✅ Response memiliki id, username, role, access
-- ✅ Role adalah salah satu dari enum valid
-- ✅ Access adalah array
+- ✅ Response has id, username, role, access
+- ✅ Role is one of valid enum
+- ✅ Access is an array
 
-#### Jika Gagal:
-- **401 No token provided** → Signin dulu untuk mendapat token
-- **404 User not found** → User dengan ID tersebut tidak ada di database
-- **500 Internal server error** → Cek koneksi database
+#### If Failed:
+- **401 No token provided** → Signin first to get token
+- **404 User not found** → User with that ID doesn't exist in database
+- **500 Internal server error** → Check database connection
 
 ---
 
-## Testing Skenario Lengkap
+## Complete Testing Scenarios
 
-### Skenario 1: Happy Path (Success Flow)
+### Scenario 1: Happy Path (Success Flow)
 ```
 1. POST /api/auth/signin
    Body: { "username": "demo", "password": "demo123" }
-   Expected: 200 OK, dapat token
+   Expected: 200 OK, get token
    
 2. GET /api/auth/validate
    Header: Authorization: Bearer <token>
@@ -246,7 +246,7 @@ Lihat hasil test di tab **Test Results** setelah send request.
    Expected: 200 OK, { "id": 1, "role": "...", "access": [...] }
 ```
 
-### Skenario 2: Unauthorized Access (No Token)
+### Scenario 2: Unauthorized Access (No Token)
 ```
 1. GET /api/auth/validate
    (tanpa Authorization header)
@@ -278,30 +278,30 @@ Lihat hasil test di tab **Test Results** setelah send request.
 
 ---
 
-## Advanced: Run Collection dengan Runner
+## Advanced: Run Collection with Runner
 
-Untuk menjalankan semua request sekaligus:
+To run all requests at once:
 
-1. Klik kanan pada collection **User & Auth Service**
-2. Pilih **Run collection**
-3. Pastikan semua request tercentang
-4. Klik **Run User & Auth Service**
-5. Lihat hasil test summary
+1. Right-click on collection **User & Auth Service**
+2. Select **Run collection**
+3. Ensure all requests are checked
+4. Click **Run User & Auth Service**
+5. View test summary
 
-**Catatan:** Request harus dijalankan berurutan (Sign In dulu) agar token tersedia untuk request berikutnya.
+**Note:** Requests must be run in sequence (Sign In first) so token is available for subsequent requests.
 
 ---
 
-## Advanced: Pre-request Script untuk Otomasi
+## Advanced: Pre-request Script for Automation
 
-Jika ingin otomatis login sebelum request protected endpoint, tambahkan Pre-request Script:
+If you want to auto-login before protected endpoint requests, add Pre-request Script:
 
 ```javascript
-// Pre-request Script untuk endpoint yang butuh auth
+// Pre-request Script for endpoints that need auth
 const BASE_URL = pm.environment.get("BASE_URL");
 const TOKEN = pm.environment.get("TOKEN");
 
-// Jika token belum ada, lakukan signin otomatis
+// If token doesn't exist yet, do automatic signin
 if (!TOKEN) {
     pm.sendRequest({
         url: BASE_URL + '/api/auth/signin',
@@ -331,59 +331,59 @@ if (!TOKEN) {
 ## Troubleshooting
 
 ### Problem: "Could not get response" / Connection refused
-**Solusi:**
-- Pastikan service sedang berjalan (cek terminal)
-- Cek PORT di environment variable sesuai dengan PORT service
-- Pastikan tidak ada firewall yang memblokir
+**Solution:**
+- Ensure service is running (check terminal)
+- Check PORT in environment variable matches service PORT
+- Ensure no firewall is blocking
 
 ### Problem: "Invalid or expired token"
-**Solusi:**
-- Jalankan ulang request Sign In untuk mendapat token baru
-- Token default expire dalam 1 jam (bisa diubah di JWT sign options)
-- Pastikan JWT_SECRET di .env sama dengan yang digunakan saat signin
+**Solution:**
+- Re-run Sign In request to get new token
+- Token expires in 1 hour by default (can be changed in JWT sign options)
+- Ensure JWT_SECRET in .env matches the one used during signin
 
-### Problem: "User not found" saat Sign In
-**Solusi:**
-- Buat user test di database terlebih dahulu
-- Atau jalankan seeder/migration jika sudah ada
-- Cek username di request body sesuai dengan data di database
+### Problem: "User not found" during Sign In
+**Solution:**
+- Create test user in database first
+- Or run seeder/migration if available
+- Check username in request body matches database data
 
-### Problem: Environment variable tidak otomatis terisi
-**Solusi:**
-- Pastikan environment sudah dipilih (cek dropdown kanan atas)
-- Buka tab **Tests** di request Sign In, pastikan script ada
-- Buka Console (Ctrl+Alt+C) untuk lihat log error
+### Problem: Environment variable not auto-filling
+**Solution:**
+- Ensure environment is selected (check top-right dropdown)
+- Open **Tests** tab in Sign In request, ensure script exists
+- Open Console (Ctrl+Alt+C) to view error logs
 
 ### Problem: Database connection error
-**Solusi:**
-- Cek file `.env` sudah terisi dengan benar
-- Pastikan MySQL/database service berjalan
-- Test koneksi database secara manual
-- Cek credentials DB_USER dan DB_PASSWORD
+**Solution:**
+- Check `.env` file is filled correctly
+- Ensure MySQL/database service is running
+- Test database connection manually
+- Check DB_USER and DB_PASSWORD credentials
 
 ---
 
 ## Tips & Best Practices
 
-1. **Gunakan Environment untuk berbagai stage:**
-   - Duplikasi environment untuk Development, Staging, Production
-   - Sesuaikan BASE_URL untuk masing-masing
+1. **Use Environment for different stages:**
+   - Duplicate environment for Development, Staging, Production
+   - Adjust BASE_URL for each
 
 2. **Save response examples:**
-   - Setelah berhasil test, klik **Save Response** → **Save as Example**
-   - Berguna untuk dokumentasi dan sharing dengan tim
+   - After successful test, click **Save Response** → **Save as Example**
+   - Useful for documentation and team sharing
 
-3. **Gunakan Collection Variables untuk data sensitif:**
-   - Jangan commit environment file dengan credential ke git
-   - Gunakan `.gitignore` untuk `*.postman_environment.json`
+3. **Use Collection Variables for sensitive data:**
+   - Don't commit environment file with credentials to git
+   - Use `.gitignore` for `*.postman_environment.json`
 
 4. **Monitor via Console:**
-   - Buka Console (View → Show Postman Console atau Ctrl+Alt+C)
-   - Lihat request/response detail dan log dari scripts
+   - Open Console (View → Show Postman Console or Ctrl+Alt+C)
+   - View request/response details and script logs
 
-5. **Export Collection untuk sharing:**
-   - Klik ... di collection → Export
-   - Share JSON file dengan tim (tanpa environment credentials)
+5. **Export Collection for sharing:**
+   - Click ... on collection → Export
+   - Share JSON file with team (without environment credentials)
 
 ---
 
@@ -399,15 +399,15 @@ if (!TOKEN) {
 
 ## Next Steps
 
-Setelah berhasil testing User & Auth Service, Anda bisa:
-1. Tambahkan endpoint signup (POST /api/auth/signup)
-2. Implementasi refresh token mechanism
-3. Tambahkan endpoint untuk update user role
-4. Implementasi audit log untuk signin activity
-5. Test integration dengan microservice lain
+After successfully testing User & Auth Service, you can:
+1. Add signup endpoint (POST /api/auth/signup)
+2. Implement refresh token mechanism
+3. Add endpoint for updating user role
+4. Implement audit log for signin activity
+5. Test integration with other microservices
 
 ---
 
-**Catatan:** Dokumentasi ini diasumsikan menggunakan service yang berjalan di `http://localhost:3005`. Sesuaikan PORT jika berbeda.
+**Note:** This documentation assumes the service runs on `http://localhost:3005`. Adjust PORT if different.
 
 **Last Updated:** November 11, 2025

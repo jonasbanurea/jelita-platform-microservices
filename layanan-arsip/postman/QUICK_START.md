@@ -1,6 +1,6 @@
 # 🚀 Quick Start Guide - Archive Service
 
-Panduan cepat untuk testing Archive Service dengan Postman.
+Quick guide for testing Archive Service with Postman.
 
 ---
 
@@ -14,11 +14,11 @@ netstat -ano | findstr "3001 3010 3020 3030 3040"
 
 **Expected**: All 5 ports should be listening
 
-### 2. Import ke Postman
+### 2. Import to Postman
 1. Open Postman
 2. Import `postman/Archive_Service.postman_collection.json`
 3. Import `postman/Archive_Service.postman_environment.json`
-4. Select **"Archive Service Environment"**
+4. Select **"Archive Service Environment"****
 
 ### 3. Run Tests
 Click **"Run Collection"** → Archive Service → **Run**
@@ -108,16 +108,16 @@ netstat -ano | findstr :3040
 ## 🛠️ Troubleshooting
 
 ### ❌ "Token not provided"
-**Fix**: Login dulu untuk mendapatkan `accessToken`
+**Fix**: Login first to get `accessToken`
 
 ### ❌ "Archive not found"
 **Fix**: 
-1. Receive trigger terlebih dahulu (POST /api/internal/arsipkan-dokumen)
-2. Check `arsip_id` tersimpan di environment
+1. Receive trigger first (POST /api/internal/arsipkan-dokumen)
+2. Check `arsip_id` saved in environment
 
 ### ❌ "Access denied. You do not have permission"
 **Fix**: OPD user trying to access archive without permission
-- Set hak_akses_opd dengan user ID OPD terlebih dahulu
+- Set hak_akses_opd with OPD user ID first
 - Or login as Admin (Admin has access to all archives)
 
 ### ❌ Port 3040 already in use
@@ -125,7 +125,7 @@ netstat -ano | findstr :3040
 ```powershell
 netstat -ano | findstr :3040
 taskkill /F /PID <PID>
-cd d:\KULIAH\TESIS\prototype\layanan-arsip
+cd d:\KULIAH\TESIS\prototype_eng\layanan-arsip
 node server.js
 ```
 
@@ -214,12 +214,12 @@ Authorization: Bearer {{accessToken}}
 
 ### Setup Database
 ```powershell
-cd d:\KULIAH\TESIS\prototype\layanan-arsip; node scripts/createDatabase.js; node scripts/setupDatabase.js
+cd d:\KULIAH\TESIS\prototype_eng\layanan-arsip; node scripts/createDatabase.js; node scripts/setupDatabase.js
 ```
 
 ### Start Archive Service
 ```powershell
-cd d:\KULIAH\TESIS\prototype\layanan-arsip; node server.js
+cd d:\KULIAH\TESIS\prototype_eng\layanan-arsip; node server.js
 ```
 
 ### Check All Services
@@ -247,7 +247,5 @@ netstat -ano | findstr "3001 3010 3020 3030 3040"
 - ✅ Internal endpoint works without auth
 
 ---
-
-**Happy Testing! 🎉**
 
 For detailed explanations, see `TESTING_GUIDE.md`

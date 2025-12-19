@@ -1,45 +1,45 @@
-# 🎯 PANDUAN SINGKAT TESTING - WORKFLOW SERVICE
+# 🎯 QUICK TESTING GUIDE - WORKFLOW SERVICE
 
-## ✅ STATUS SETUP
+## ✅ SETUP STATUS
 
 ### Database
-- ✅ Database `jelita_workflow` telah dibuat
-- ✅ Tabel `disposisi`, `kajian_teknis`, `draft_izin`, `revisi_draft` telah dibuat
-- ✅ Foreign keys dan constraints telah dikonfigurasi
+- ✅ Database `jelita_workflow` created
+- ✅ Tables `disposisi`, `kajian_teknis`, `draft_izin`, `revisi_draft` created
+- ✅ Foreign keys and constraints configured
 
 ### Server
-- ✅ Dependencies terinstall (express, sequelize, mysql2, jsonwebtoken, axios)
-- ✅ Server berjalan di **Port 3020**
-- ✅ Workflow Service siap digunakan
+- ✅ Dependencies installed (express, sequelize, mysql2, jsonwebtoken, axios)
+- ✅ Server running on **Port 3020**
+- ✅ Workflow Service ready to use
 
 ---
 
 ## 🚀 QUICK START TESTING
 
-### 1. Import ke Postman
+### 1. Import to Postman
 
 **Collection & Environment**:
 - File: `postman/Workflow_Service.postman_collection.json`
 - File: `postman/Workflow_Service.postman_environment.json`
 
-**Cara Import**:
-1. Buka Postman
-2. Klik **Import** (kiri atas)
-3. Drag & drop kedua file JSON
-4. Pilih environment **"Workflow Service Environment"** di dropdown kanan atas
+**Import Steps**:
+1. Open Postman
+2. Click **Import** (top left)
+3. Drag & drop both JSON files
+4. Select environment **"Workflow Service Environment"** in dropdown (top right)
 
 ---
 
-### 2. Environment Variables yang Perlu Diisi Manual
+### 2. Environment Variables to Fill Manually
 
-Sebelum testing, set nilai berikut di environment:
+Before testing, set the following values in environment:
 
-| Variable | Cara Mendapat Nilai | Contoh |
-|----------|---------------------|--------|
-| `permohonan_id` | Dari Application Service → Buat permohonan baru | `1` |
-| `opd_user_id` | Dari database → SELECT id FROM jelita_users.users WHERE role='OPD' | `2` |
+| Variable | How to Get Value | Example |
+|----------|------------------|----------|
+| `permohonan_id` | From Application Service → Create new application | `1` |
+| `opd_user_id` | From database → SELECT id FROM jelita_users.users WHERE role='OPD' | `2` |
 
-**Query untuk mendapat OPD User ID**:
+**Query to get OPD User ID**:
 ```sql
 SELECT id, username, nama_lengkap, role 
 FROM jelita_users.users 
@@ -47,7 +47,7 @@ WHERE role = 'OPD'
 LIMIT 1;
 ```
 
-Jika belum ada user OPD, buat dengan:
+If no OPD user exists, create with:
 ```sql
 INSERT INTO jelita_users.users (username, password_hash, nama_lengkap, role)
 VALUES (
@@ -60,9 +60,9 @@ VALUES (
 
 ---
 
-### 3. Urutan Testing (5 Endpoint)
+### 3. Testing Sequence (5 Endpoints)
 
-#### 📍 Test 1: Login sebagai Admin
+#### 📍 Test 1: Login as Admin
 **Collection**: User & Auth Service (port 3001)  
 **Request**: POST /api/auth/signin  
 **Body**:
@@ -72,11 +72,11 @@ VALUES (
   "password": "demo123"
 }
 ```
-✅ Token akan otomatis tersimpan di `{{accessToken}}`
+✅ Token will be automatically saved in `{{accessToken}}`
 
 ---
 
-#### 📍 Test 2: Create Disposisi OPD
+#### 📍 Test 2: Create OPD Disposition
 **Request**: POST /api/workflow/disposisi-opd  
 **Body**:
 ```json
@@ -84,14 +84,14 @@ VALUES (
   "permohonan_id": {{permohonan_id}},
   "nomor_registrasi": "REG/2024/01/0001",
   "opd_id": {{opd_user_id}},
-  "catatan_disposisi": "Mohon segera dilakukan kajian teknis untuk permohonan ini"
+  "catatan_disposisi": "Please conduct technical review immediately for this application"
 }
 ```
-**Expected**: Status 201, `disposisi_id` tersimpan otomatis
+**Expected**: Status 201, `disposisi_id` saved automatically
 
 ---
 
-#### 📍 Test 3: Login sebagai OPD
+#### 📍 Test 3: Login as OPD
 **Collection**: User & Auth Service  
 **Request**: POST /api/auth/signin  
 **Body**:
@@ -101,11 +101,11 @@ VALUES (
   "password": "demo123"
 }
 ```
-✅ Token OPD akan mengganti token Admin di `{{accessToken}}`
+✅ OPD token will replace Admin token in `{{accessToken}}`
 
 ---
 
-#### 📍 Test 4: Input Kajian Teknis
+#### 📍 Test 4: Input Technical Review
 **Request**: POST /api/workflow/kajian-teknis  
 **Body**:
 ```json
@@ -113,8 +113,8 @@ VALUES (
   "permohonan_id": {{permohonan_id}},
   "opd_id": {{opd_user_id}},
   "hasil_kajian": "disetujui",
-  "rekomendasi": "Permohonan disetujui dengan catatan untuk memperhatikan aspek lingkungan",
-  "catatan_teknis": "Lokasi memenuhi syarat zonasi. Tidak ada kendala teknis yang signifikan.",
+  "rekomendasi": "Application approved with note to pay attention to environmental aspects",
+  "catatan_teknis": "Location meets zoning requirements. No significant technical constraints.",
   "lampiran": [
     {
       "nama_file": "peta_lokasi_survey.pdf",
@@ -127,16 +127,16 @@ VALUES (
   ]
 }
 ```
-**Expected**: Status 201, `kajian_id` tersimpan, `reviewer_id` terisi otomatis
+**Expected**: Status 201, `kajian_id` saved, `reviewer_id` filled automatically
 
 ---
 
-#### 📍 Test 5: Login sebagai Admin (lagi)
-Ulangi Test 1 untuk mendapat token Admin
+#### 📍 Test 5: Login as Admin (again)
+Repeat Test 1 to get Admin token
 
 ---
 
-#### 📍 Test 6: Forward Draft to Pimpinan
+#### 📍 Test 6: Forward Draft to Leadership
 **Request**: POST /api/workflow/forward-to-pimpinan  
 **Body**:
 ```json
@@ -144,15 +144,15 @@ Ulangi Test 1 untuk mendapat token Admin
   "permohonan_id": {{permohonan_id}},
   "nomor_registrasi": "REG/2024/01/0001",
   "nomor_draft": "DRAFT/2024/01/0001",
-  "isi_draft": "KEPUTUSAN KEPALA DAERAH\nNOMOR: DRAFT/2024/01/0001\n\nTENTANG\nPERSETUJUAN IZIN MENDIRIKAN BANGUNAN\n\nKEPALA DAERAH,\n\nMenimbang:\na. Bahwa berdasarkan permohonan...\nb. Bahwa berdasarkan hasil kajian teknis...\n\nMengingat:\n1. Undang-Undang...\n2. Peraturan Daerah...\n\nMEMUTUSKAN:\n\nMenetapkan:\nKESATU: Menyetujui permohonan izin...\nKEDUA: Izin berlaku selama...\nKETIGA: Keputusan ini mulai berlaku...\n\nDitetapkan di: ...\nPada tanggal: ...\n\nKEPALA DAERAH,\n\n(Nama Pejabat)"
+  "isi_draft": "REGIONAL HEAD DECISION\nNUMBER: DRAFT/2024/01/0001\n\nABOUT\nAPPROVAL OF BUILDING PERMIT\n\nREGIONAL HEAD,\n\nConsidering:\na. That based on the application...\nb. That based on technical review results...\n\nRecalling:\n1. Law...\n2. Regional Regulation...\n\nDECIDES:\n\nEstablishes:\nFIRST: Approving the permit application...\nSECOND: Permit valid for...\nTHIRD: This decision effective from...\n\nEstablished in: ...\nOn date: ...\n\nREGIONAL HEAD,\n\n(Official Name)"
 }
 ```
-**Expected**: Status 201, `draft_id` tersimpan, status `dikirim_ke_pimpinan`
+**Expected**: Status 201, `draft_id` saved, status `dikirim_ke_pimpinan`
 
 ---
 
-#### 📍 Test 7: Login sebagai Pimpinan
-**Note**: Buat user Pimpinan dulu jika belum ada
+#### 📍 Test 7: Login as Leadership
+**Note**: Create Leadership user first if not exists
 ```sql
 INSERT INTO jelita_users.users (username, password_hash, nama_lengkap, role)
 VALUES (
@@ -174,41 +174,41 @@ VALUES (
 
 ---
 
-#### 📍 Test 8: Request Revisi Draft
+#### 📍 Test 8: Request Draft Revision
 **Request**: POST /api/workflow/revisi-draft  
 **Body**:
 ```json
 {
   "draft_id": {{draft_id}},
-  "catatan_revisi": "Mohon untuk memperbaiki bagian pertimbangan hukum pada poin b. Tambahkan referensi ke Perda terbaru No. 5 Tahun 2024. Serta pastikan format penomoran sesuai dengan standar terbaru."
+  "catatan_revisi": "Please revise the legal considerations section in point b. Add reference to latest Regional Regulation No. 5 of 2024. Also ensure numbering format follows the latest standard."
 }
 ```
 **Expected**: 
 - Status 201
-- Draft status berubah menjadi `perlu_revisi`
-- Record revisi dibuat dengan status `pending`
-- `revisi_id` tersimpan
+- Draft status changed to `perlu_revisi`
+- Revision record created with status `pending`
+- `revisi_id` saved
 
 ---
 
-## 📊 Validasi di Database
+## 📊 Database Validation
 
-### Check Disposisi
+### Check Disposition
 ```sql
 SELECT * FROM jelita_workflow.disposisi;
 ```
 
-### Check Kajian Teknis
+### Check Technical Review
 ```sql
 SELECT * FROM jelita_workflow.kajian_teknis;
 ```
 
-### Check Draft Izin
+### Check Permit Draft
 ```sql
 SELECT * FROM jelita_workflow.draft_izin;
 ```
 
-### Check Revisi Draft
+### Check Draft Revision
 ```sql
 SELECT * FROM jelita_workflow.revisi_draft;
 ```
@@ -236,93 +236,93 @@ WHERE d.permohonan_id = 1;
 
 ## 🔍 Expected Test Results
 
-### ✅ Semua Test Harus Pass:
+### ✅ All Tests Must Pass:
 
 1. **Test 1 (Login Admin)**: 
    - Status: 200
-   - Token tersimpan
+   - Token saved
    
-2. **Test 2 (Disposisi OPD)**: 
+2. **Test 2 (OPD Disposition)**: 
    - Status: 201
-   - `disposisi_id` tersimpan
+   - `disposisi_id` saved
    - `status` = 'pending'
    
 3. **Test 3 (Login OPD)**: 
    - Status: 200
-   - Token OPD tersimpan
+   - OPD token saved
    
-4. **Test 4 (Kajian Teknis)**: 
+4. **Test 4 (Technical Review)**: 
    - Status: 201
-   - `kajian_id` tersimpan
-   - `reviewer_id` tidak null
-   - `hasil_kajian` sesuai input
+   - `kajian_id` saved
+   - `reviewer_id` not null
+   - `hasil_kajian` matches input
    
-5. **Test 5 (Login Admin lagi)**: 
+5. **Test 5 (Login Admin again)**: 
    - Status: 200
-   - Token Admin tersimpan
+   - Admin token saved
    
 6. **Test 6 (Forward Draft)**: 
    - Status: 201
-   - `draft_id` tersimpan
+   - `draft_id` saved
    - `status` = 'dikirim_ke_pimpinan'
-   - `tanggal_kirim_pimpinan` tidak null
+   - `tanggal_kirim_pimpinan` not null
    
-7. **Test 7 (Login Pimpinan)**: 
+7. **Test 7 (Login Leadership)**: 
    - Status: 200
-   - Token Pimpinan tersimpan
+   - Leadership token saved
    
-8. **Test 8 (Revisi Draft)**: 
+8. **Test 8 (Draft Revision)**: 
    - Status: 201
-   - `revisi_id` tersimpan
+   - `revisi_id` saved
    - Draft status = 'perlu_revisi'
-   - Revisi status = 'pending'
+   - Revision status = 'pending'
 
 ---
 
 ## 🚨 Troubleshooting Common Issues
 
 ### Error: "Token tidak valid"
-**Fix**: Login ulang, token mungkin expired (1 jam)
+**Fix**: Login again, token may have expired (1 hour)
 
 ### Error: "Access denied. Required role: Admin"
-**Fix**: Pastikan login dengan user role yang benar sesuai endpoint
+**Fix**: Ensure login with correct user role for the endpoint
 
 ### Error: "Duplicate entry for key 'nomor_draft'"
-**Fix**: Ganti nomor draft (harus unique): `DRAFT/2024/01/0002`
+**Fix**: Change draft number (must be unique): `DRAFT/2024/01/0002`
 
 ### Error: "Draft tidak ditemukan"
-**Fix**: Pastikan `draft_id` ada di environment variable dan valid
+**Fix**: Ensure `draft_id` exists in environment variable and is valid
 
-### Server tidak berjalan
+### Server not running
 **Fix**:
 ```powershell
 # Check port
 netstat -ano | findstr :3020
 
 # Restart server
-Set-Location -Path 'd:\KULIAH\TESIS\prototype\layanan-alur-kerja'
+Set-Location -Path 'd:\KULIAH\TESIS\prototype_eng\layanan-alur-kerja'
 node server.js
 ```
 
 ---
 
-## 📚 Dokumentasi Lengkap
+## 📚 Complete Documentation
 
-- **Full Testing Guide**: `postman/TESTING_GUIDE.md` (50+ halaman)
+- **Full Testing Guide**: `postman/TESTING_GUIDE.md` (50+ pages)
 - **README**: `README.md`
-- **API Docs**: Lihat collection Postman
+- **API Docs**: See Postman collection
 
 ---
 
-## 🎉 Selamat Testing!
+## 🎉 Happy Testing!
 
-Semua endpoint Workflow Service sudah siap diuji.
+All Workflow Service endpoints are ready to test.
 
 **Next Steps**:
 1. Import Postman collection & environment
-2. Buat user OPD dan Pimpinan (jika belum ada)
-3. Dapatkan `permohonan_id` dari Application Service
-4. Ikuti urutan testing 1-8
-5. Verifikasi di database
+2. Create OPD and Leadership users (if not exists)
+3. Get `permohonan_id` from Application Service
+4. Follow testing sequence 1-8
+5. Verify in database
 
-**Support**: Jika ada masalah, cek TESTING_GUIDE.md untuk troubleshooting detail.
+**Support**: If you have issues, check TESTING_GUIDE.md for detailed troubleshooting.

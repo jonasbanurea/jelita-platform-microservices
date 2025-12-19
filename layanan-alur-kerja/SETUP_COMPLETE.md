@@ -1,22 +1,22 @@
 # ✅ WORKFLOW SERVICE - SETUP COMPLETED!
 
-## 🎉 Status Lengkap
+## 🎉 Complete Status
 
-### ✅ Yang Sudah Selesai
+### ✅ Completed Tasks
 
 1. **Database Setup**
-   - ✅ Database `jelita_workflow` telah dibuat
-   - ✅ 4 tabel telah dibuat:
+   - ✅ Database `jelita_workflow` created
+   - ✅ 4 tables created:
      - `disposisi`
      - `kajian_teknis`
      - `draft_izin`
      - `revisi_draft`
-   - ✅ Foreign keys dan constraints dikonfigurasi
+   - ✅ Foreign keys and constraints configured
 
 2. **Server Setup**
-   - ✅ Dependencies terinstall
-   - ✅ Server berjalan di **Port 3020**
-   - ✅ 5 endpoint workflow siap digunakan
+   - ✅ Dependencies installed
+   - ✅ Server running on **Port 3020**
+   - ✅ 5 workflow endpoints ready to use
 
 3. **Models Created**
    - ✅ Disposisi.js (enhanced)
@@ -40,16 +40,16 @@
 
 ---
 
-## 🚀 CARA MULAI TESTING
+## 🚀 HOW TO START TESTING
 
-### Step 1: Buat User OPD dan Pimpinan
+### Step 1: Create OPD and Leadership Users
 
-**Jalankan SQL berikut di MySQL**:
+**Run the following SQL in MySQL**:
 
 ```sql
 USE jelita_users;
 
--- User OPD (jika belum ada)
+-- OPD User (if not exists)
 INSERT INTO users (username, password_hash, nama_lengkap, role, created_at, updated_at)
 VALUES (
   'opd_demo',
@@ -60,7 +60,7 @@ VALUES (
   NOW()
 );
 
--- User Pimpinan (jika belum ada)
+-- Leadership User (if not exists)
 INSERT INTO users (username, password_hash, nama_lengkap, role, created_at, updated_at)
 VALUES (
   'pimpinan_demo',
@@ -71,11 +71,11 @@ VALUES (
   NOW()
 );
 
--- Cek semua user
+-- Check all users
 SELECT id, username, nama_lengkap, role FROM users;
 ```
 
-**Simpan ID user dengan role OPD** (akan digunakan di Postman).
+**Save the user ID with OPD role** (will be used in Postman).
 
 ---
 
@@ -92,30 +92,30 @@ SELECT id, username, nama_lengkap, role FROM users;
 
 ### Step 3: Set Environment Variables
 
-Di Postman, klik ikon mata (👁️) di kanan atas, lalu edit environment:
+In Postman, click the eye icon (👁️) at the top right, then edit environment:
 
-| Variable | Value | Keterangan |
-|----------|-------|------------|
-| `workflow_base_url` | `http://localhost:3020` | Sudah terisi |
-| `auth_base_url` | `http://localhost:3001` | Sudah terisi |
-| `permohonan_id` | **ISI MANUAL** | ID dari Application Service |
-| `opd_user_id` | **ISI MANUAL** | ID user dengan role OPD |
+| Variable | Value | Description |
+|----------|-------|-------------|
+| `workflow_base_url` | `http://localhost:3020` | Already filled |
+| `auth_base_url` | `http://localhost:3001` | Already filled |
+| `permohonan_id` | **FILL MANUALLY** | ID from Application Service |
+| `opd_user_id` | **FILL MANUALLY** | User ID with OPD role |
 
-**Cara mendapat permohonan_id**:
+**How to get permohonan_id**:
 ```sql
--- Dari Application Service
+-- From Application Service
 SELECT id, nomor_registrasi, status FROM jelita_permohonan.permohonan LIMIT 1;
 ```
 
-Atau buat permohonan baru via Postman (Application Service collection).
+Or create a new application via Postman (Application Service collection).
 
 ---
 
 ### Step 4: Testing Flow
 
-**Urutan pengujian 5 endpoint**:
+**Testing sequence for 5 endpoints**:
 
-#### 1️⃣ Login sebagai Admin
+#### 1️⃣ Login as Admin
 Collection: **User & Auth Service**  
 Request: **POST /api/auth/signin**  
 Body:
@@ -125,11 +125,11 @@ Body:
   "password": "demo123"
 }
 ```
-✅ Token tersimpan otomatis di `{{accessToken}}`
+✅ Token saved automatically in `{{accessToken}}`
 
 ---
 
-#### 2️⃣ Create Disposisi OPD
+#### 2️⃣ Create OPD Disposition
 Collection: **Workflow Service**  
 Request: **POST /api/workflow/disposisi-opd**  
 Body:
@@ -138,14 +138,14 @@ Body:
   "permohonan_id": 1,
   "nomor_registrasi": "REG/2024/01/0001",
   "opd_id": 2,
-  "catatan_disposisi": "Mohon segera dilakukan kajian teknis"
+  "catatan_disposisi": "Please conduct technical review immediately"
 }
 ```
-**Expected**: Status 201, `disposisi_id` tersimpan
+**Expected**: Status 201, `disposisi_id` saved
 
 ---
 
-#### 3️⃣ Login sebagai OPD
+#### 3️⃣ Login as OPD
 Collection: **User & Auth Service**  
 Request: **POST /api/auth/signin**  
 Body:
@@ -155,11 +155,11 @@ Body:
   "password": "demo123"
 }
 ```
-✅ Token OPD mengganti token Admin
+✅ OPD token replaces Admin token
 
 ---
 
-#### 4️⃣ Input Kajian Teknis
+#### 4️⃣ Input Technical Review
 Collection: **Workflow Service**  
 Request: **POST /api/workflow/kajian-teknis**  
 Body:
@@ -168,23 +168,23 @@ Body:
   "permohonan_id": 1,
   "opd_id": 2,
   "hasil_kajian": "disetujui",
-  "rekomendasi": "Permohonan disetujui dengan catatan...",
-  "catatan_teknis": "Lokasi memenuhi syarat zonasi...",
+  "rekomendasi": "Application approved with notes...",
+  "catatan_teknis": "Location meets zoning requirements...",
   "lampiran": [
     {"nama_file": "survey.pdf", "url": "/uploads/survey.pdf"}
   ]
 }
 ```
-**Expected**: Status 201, `kajian_id` tersimpan
+**Expected**: Status 201, `kajian_id` saved
 
 ---
 
-#### 5️⃣ Login sebagai Admin (lagi)
-Ulangi step 1 untuk mendapat token Admin
+#### 5️⃣ Login as Admin (again)
+Repeat step 1 to get Admin token
 
 ---
 
-#### 6️⃣ Forward Draft to Pimpinan
+#### 6️⃣ Forward Draft to Leadership
 Collection: **Workflow Service**  
 Request: **POST /api/workflow/forward-to-pimpinan**  
 Body:
@@ -193,14 +193,14 @@ Body:
   "permohonan_id": 1,
   "nomor_registrasi": "REG/2024/01/0001",
   "nomor_draft": "DRAFT/2024/01/0001",
-  "isi_draft": "KEPUTUSAN KEPALA DAERAH\nNOMOR: DRAFT/2024/01/0001..."
+  "isi_draft": "REGIONAL HEAD DECISION\nNUMBER: DRAFT/2024/01/0001..."
 }
 ```
-**Expected**: Status 201, `draft_id` tersimpan, status `dikirim_ke_pimpinan`
+**Expected**: Status 201, `draft_id` saved, status `dikirim_ke_pimpinan`
 
 ---
 
-#### 7️⃣ Login sebagai Pimpinan
+#### 7️⃣ Login as Leadership
 Collection: **User & Auth Service**  
 Request: **POST /api/auth/signin**  
 Body:
@@ -213,40 +213,40 @@ Body:
 
 ---
 
-#### 8️⃣ Request Revisi Draft
+#### 8️⃣ Request Draft Revision
 Collection: **Workflow Service**  
 Request: **POST /api/workflow/revisi-draft**  
 Body:
 ```json
 {
   "draft_id": 1,
-  "catatan_revisi": "Mohon perbaiki bagian pertimbangan hukum..."
+  "catatan_revisi": "Please revise the legal considerations section..."
 }
 ```
 **Expected**: 
 - Status 201
 - Draft status → `perlu_revisi`
-- Revisi record dibuat
-- `revisi_id` tersimpan
+- Revision record created
+- `revisi_id` saved
 
 ---
 
-## 📊 Validasi Database
+## 📊 Database Validation
 
 ```sql
--- Check disposisi
+-- Check disposition
 SELECT * FROM jelita_workflow.disposisi;
 
--- Check kajian teknis
+-- Check technical review
 SELECT * FROM jelita_workflow.kajian_teknis;
 
--- Check draft izin
+-- Check permit draft
 SELECT * FROM jelita_workflow.draft_izin;
 
--- Check revisi draft
+-- Check draft revision
 SELECT * FROM jelita_workflow.revisi_draft;
 
--- Full workflow (join semua tabel)
+-- Full workflow (join all tables)
 SELECT 
   d.nomor_registrasi,
   d.status AS disposisi_status,
@@ -264,25 +264,25 @@ LEFT JOIN revisi_draft rd ON di.id = rd.draft_id;
 
 ## 🔧 Troubleshooting
 
-### Server tidak berjalan?
+### Server not running?
 ```powershell
-Set-Location -Path 'd:\KULIAH\TESIS\prototype\layanan-alur-kerja'
+Set-Location -Path 'd:\KULIAH\TESIS\prototype_eng\layanan-alur-kerja'
 node server.js
 ```
 
-### Port 3020 sudah digunakan?
+### Port 3020 already in use?
 ```powershell
 netstat -ano | findstr :3020
 taskkill /PID <PID> /F
 ```
 
 ### Token expired?
-Login ulang untuk mendapat token baru (token berlaku 1 jam).
+Login again to get a new token (token valid for 1 hour).
 
 ### Database error?
 ```powershell
 # Recreate database
-cd d:\KULIAH\TESIS\prototype\layanan-alur-kerja
+cd d:\KULIAH\TESIS\prototype_eng\layanan-alur-kerja
 node scripts/createDatabase.js
 node scripts/setupDatabase.js
 ```
@@ -321,64 +321,64 @@ layanan-alur-kerja/
 
 ---
 
-## 📚 Dokumentasi
+## 📚 Documentation
 
-- **Quick Start**: `QUICK_START.md` (panduan singkat)
-- **Full Testing Guide**: `postman/TESTING_GUIDE.md` (50+ halaman)
-- **README**: `README.md` (dokumentasi API)
+- **Quick Start**: `QUICK_START.md` (short guide)
+- **Full Testing Guide**: `postman/TESTING_GUIDE.md` (50+ pages)
+- **README**: `README.md` (API documentation)
 - **Postman Collection**: `postman/Workflow_Service.postman_collection.json`
 - **Postman Environment**: `postman/Workflow_Service.postman_environment.json`
 
 ---
 
-## 🎯 Checklist Final
+## 🎯 Final Checklist
 
 ### Pre-Testing
 - [ ] MySQL Server running
 - [ ] User & Auth Service running (port 3001)
 - [ ] Application Service running (port 3010)
 - [ ] Workflow Service running (port 3020)
-- [ ] User OPD dibuat
-- [ ] User Pimpinan dibuat
+- [ ] OPD user created
+- [ ] Leadership user created
 - [ ] Postman collection imported
 - [ ] Postman environment imported & activated
-- [ ] Environment variables diisi (`permohonan_id`, `opd_user_id`)
+- [ ] Environment variables filled (`permohonan_id`, `opd_user_id`)
 
 ### Testing
 - [ ] Test 1: Login Admin ✅
-- [ ] Test 2: Create Disposisi ✅
+- [ ] Test 2: Create Disposition ✅
 - [ ] Test 3: Login OPD ✅
-- [ ] Test 4: Input Kajian Teknis ✅
-- [ ] Test 5: Login Admin (lagi) ✅
+- [ ] Test 4: Input Technical Review ✅
+- [ ] Test 5: Login Admin (again) ✅
 - [ ] Test 6: Forward Draft ✅
-- [ ] Test 7: Login Pimpinan ✅
-- [ ] Test 8: Request Revisi ✅
+- [ ] Test 7: Login Leadership ✅
+- [ ] Test 8: Request Revision ✅
 
 ### Validation
-- [ ] Semua test Postman PASS
-- [ ] Data tersimpan di database
+- [ ] All Postman tests PASS
+- [ ] Data saved in database
 - [ ] Environment variables auto-saved
 - [ ] Role-based access working
 - [ ] Timestamps generated correctly
 
 ---
 
-## 🎉 SELESAI!
+## 🎉 COMPLETED!
 
-Layanan Alur Kerja (Workflow Service) **SIAP DIGUNAKAN**!
+Workflow Service is **READY TO USE**!
 
 **Next Steps**:
-1. ✅ Jalankan semua 3 services (auth, application, workflow)
-2. ✅ Buat user OPD dan Pimpinan (SQL di atas)
+1. ✅ Run all 3 services (auth, application, workflow)
+2. ✅ Create OPD and Leadership users (SQL above)
 3. ✅ Import Postman collection & environment
 4. ✅ Set environment variables
-5. ✅ Testing 8 steps di atas
-6. ✅ Verifikasi di database
+5. ✅ Test 8 steps above
+6. ✅ Verify in database
 
-**Dokumentasi Lengkap**: Baca `postman/TESTING_GUIDE.md` untuk detail.
+**Complete Documentation**: Read `postman/TESTING_GUIDE.md` for details.
 
 ---
 
-**Support**: Jika ada pertanyaan atau masalah, cek troubleshooting di TESTING_GUIDE.md.
+**Support**: If you have questions or issues, check troubleshooting in TESTING_GUIDE.md.
 
-**Happy Testing! 🚀**
+
