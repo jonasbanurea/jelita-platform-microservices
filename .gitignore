@@ -93,9 +93,6 @@ report-baseline-stress-user-count-jelita.md
 tests/results/*.json
 tests/results/*.html
 
-# Submission guide (internal)
-GITHUB_SUBMISSION_GUIDE.md
-
 # Optional npm cache
 .npm
 
